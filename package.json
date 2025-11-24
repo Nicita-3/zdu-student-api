@@ -4,10 +4,23 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "docs": "typedoc --out docs src",
+    "test": "node --loader ts-node/esm src/examples.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "jsdoc": "^4.0.5",
+    "ts-node": "^10.9.2",
+    "typedoc": "^0.28.14",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "buffer": "^6.0.3",
+    "iconv-lite": "^0.7.0",
+    "node-fetch": "^3.3.2"
+  }
 }
