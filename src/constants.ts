@@ -2,6 +2,9 @@ import { Faculty } from './types.ts';
 
 /**
 * Список факультетів університету.
+* @category Schedule
+* 
+* @remarks
 * - `none`: { id: 0, name: 'Оберіть факультет' }
 * - `physicsMath`: { id: 1001, name: 'Фізико-математичний факультет' }
 * - `philologyJournalism`: { id: 1002, name: 'Навчально-науковий інститут філології та журналістики' }
@@ -34,7 +37,9 @@ export const faculties: Record<string, Faculty> = {
 
 /**
 * Список помилок для розкладу.
+* @category Schedule
 *
+* @remarks
 * Ключі — числові коди помилок.
 * Значення — опис помилки.
 *
@@ -71,11 +76,30 @@ export const scheduleErrors: Record<number, string> = {
 
 /**
 * Тип розкладу.
+* @category Schedule
 *
+* @remarks
 * Типи: group, teacher, room.
 */
 export const scheduleTypes: Record<string, string> = {
     group: 'group',
     teacher: 'teacher',
     room: 'room',
+}
+
+/**
+* Блоки
+* @category Audience
+*/
+export const blocks: Record<string, string> = {
+    block_1: '№1',
+    block_2: '№2',
+    block_3: '№3',
+    block_4: '№4',
+    block_5: '№5',
+    hostel_1: 'гуртож №1',
+    hostel_2: 'гуртож №2',
+    hostel_3: 'гуртож №3',
+    hostel_4: 'гуртож №4',
+    hostel_5: 'гуртож №5',
 }

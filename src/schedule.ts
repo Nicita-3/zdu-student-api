@@ -1,18 +1,13 @@
 import iconv from 'iconv-lite';
 import fetch from 'node-fetch';
-import { Buffer } from 'buffer';
-import { faculties } from '../constants.ts';
-import { Faculty, ScheduleTypes } from '../types.ts';
+import { faculties } from './constants.ts';
+import { BaseLesson, DetailedLesson, Faculty, ScheduleTypes } from './types.ts';
 
 /**
  * Клас розкладу
+ * @category Schedule
  */
 export class Schedule {
-    /**
-    * Посилання на розклад
-    */
-    private url: string = 'https://dekanat.zu.edu.ua/cgi-bin';
-
     /**
     * Тип розкладу.
     *
@@ -53,6 +48,7 @@ export class Schedule {
     /**
      * Факультет.
      * 
+     * @example
      * Можна призначити одну з констант з `faculties`, наприклад:
      * ```ts
      * schedule.faculty = faculties.physicsMath;
@@ -104,7 +100,44 @@ export class Schedule {
         return this._rosText;
     }
 
-    public async getSchedule() {
+    /**
+    * Повертає список пар (розклад)
+    *
+    * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
+    *
+    * @example
+    * ```ts
+    * import { Schedule, scheduleErrors } from "./index.ts";
+    * const schedule = new Schedule();
+    * schedule.group = '23Бд-СОінф123' // встановлюєм неправильну назву групи
+    * schedule.type = 'group' // встановлєм тип пошуку по групі
+    * schedule.rosText = true; // встановлюєм окремі стовпчики
+    * schedule.allStreamComponents = true; // встановлюєм повний склад потоку
+    * try {
+    *   const mySchedule = await schedule.getSchedule();
+    *   console.log("Розклад:", mySchedule);
+    * } catch (err: any) {
+    *   // Отримуєм помилку тому що ми неправильно вказали назву групи
+    *   console.error(err.message); // Поверне: "{"error_message":"Об‘єкт - 23Бд-СОінф123 - Об‘єкт не знайдено  ","errorcode":"-90"}"
+    *   console.error(scheduleErrors[JSON.parse(err.message).errorcode]); // Поверне: "Об`єкт, для якого потрібно показати розклад, не знайдено"
+    * }
+    * ```
+    *
+    * @remarks
+    * У `err.message` може повертатися простий текст помилки, 
+    * або об’єкт у форматі:
+    * ```JSON
+    * {
+    *   "error_message": "Текст помилки",
+    *   "errorcode": "Код помилки"
+    * }
+    * ```
+    * 
+    * Де:
+    * - `error_message` - текст помилки відповідно до {@link scheduleErrors}
+    * - `errorcode` - код помилки відповідно до {@link scheduleErrors}
+    */
+    public async getSchedule(): Promise<DetailedLesson[] | BaseLesson[]> {
         const beginDate = this.beginDate.toLocaleDateString('uk-UA', {
             day: '2-digit',
             month: '2-digit',
@@ -118,19 +151,19 @@ export class Schedule {
         let id: number | string | undefined = (this.type === 'group' ? this.groupId : this.type === 'teacher' ? this.teacherId : this.roomId);
         if (!id) id = '';
         let name: string = (this.type === 'group' ? this.group : this.type === 'teacher' ? this.teacher : this.room);
-        name = this._encodeCP1251(name);
+        name = this.encodeCP1251(name);
 
         const response = await fetch(`https://dekanat.zu.edu.ua/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=${this.type}&OBJ_ID=${id}&OBJ_name=${name}&dep_name=&begin_date=${beginDate}&end_date=${endDate}&ros_text=${this.rosText ? 'separated' : 'united'}${this.showEmpty ? '' : '&show_empty=yes'}${this.allStreamComponents ? '' : '&all_stream_components=yes'}&req_format=json&coding_mode=UTF8&bs=%D1%F4%EE%F0%EC%F3%E2%E0%F2%E8+%E7%E0%EF%E8%F2`);
-        if (!response.ok) return [];
+        if (!response.ok) throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
         const data: any = await response.json();
-        if (data.psrozklad_export.code == 0) return data.psrozklad_export.roz_items; // бажано зробити що б повертало текст і код помилки.
-        return []
+        if (data.psrozklad_export.code !== '0') {
+            throw new Error(JSON.stringify(data.psrozklad_export.error) || "Unknown error");
+        }
+        return data.psrozklad_export.roz_items;
     }
 
-    private _encodeCP1251(str: string) {
+    private encodeCP1251(str: string) {
         const buf = iconv.encode(str, 'win1251');
-        return Array.from(buf)
-            .map(b => '%' + b.toString(16).toUpperCase().padStart(2, '0'))
-            .join('');
+        return Array.from(buf).map(b => '%' + b.toString(16).toUpperCase().padStart(2, '0')).join('');
     }
 }

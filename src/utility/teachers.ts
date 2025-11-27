@@ -2,15 +2,17 @@ import { Teacher } from "../types.ts";
 
 /**
 * Повертає список викладачів
+* @category Utility
 * 
 * @param query - Рядок пошуку викладача
 * @returns Масив викладачів
 * 
-* Приклад використання
+* @example
 * ```ts
 * console.log((await getTeachers('Кривонос Олександр')));
 * ```
 * 
+* @remarks
 * Виведе:
 * ```JSON
 * [
@@ -25,7 +27,7 @@ import { Teacher } from "../types.ts";
 * ]
 * ```
 */
-export async function getTeachers(query?: string) {
+export async function getTeachers(query?: string): Promise<Teacher[]> {
     try {
         const url = `https://dekanat.zu.edu.ua/cgi-bin/timetable_export.cgi?req_type=obj_list&req_mode=teacher&show_ID=yes&req_format=json&coding_mode=UTF8&bs=%D1%F4%EE%F0%EC%F3%E2%E0%F2%E8+%E7%E0%EF%E8%F2`;
         const response = await fetch(url);

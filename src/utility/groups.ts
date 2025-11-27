@@ -2,15 +2,17 @@ import { Group } from "../types.ts";
 
 /**
 * Повертає список груп
+* @category Utility
 * 
 * @param query - Рядок пошуку групи
 * @returns Масив груп
 * 
-* Приклад використання
+* @example
 * ```ts
 * console.log((await getGroups('23Бд-СОінф')));
 * ```
 *
+* @remarks
 * Виведе:
 * ```JSON
 * [

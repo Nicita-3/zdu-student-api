@@ -2,15 +2,17 @@ import { Room } from "../types.ts";
 
 /**
 * Повертає список аудиторій
+* @category Utility
 * 
 * @param query - Рядок пошуку аудиторії
 * @returns Масив аудиторій
 * 
-* Приклад використання
+* @example
 * ```ts
 * console.log((await getRooms('319')));
 * ```
 * 
+* @remarks
 * Виведе:
 * ```JSON
 * [
