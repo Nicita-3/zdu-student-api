@@ -1,4 +1,4 @@
-import { Group } from "../types.ts";
+import { Group } from "../types.js";
 /**
 * Повертає список груп
 * @category Utility

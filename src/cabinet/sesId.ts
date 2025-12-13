@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch';
 import iconv from "iconv-lite";
-import { SessionData } from "./types";
+import { SessionData } from "./types.js";
 
 /**
  * Отримати sesID та sessGUID користувача

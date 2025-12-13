@@ -1,4 +1,4 @@
-import { TypeAudience } from "../types.ts";
+import { TypeAudience } from "../types.js";
 /**
 * Повертає список типів аудиторій
 * @category Utility

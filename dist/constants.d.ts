@@ -1,4 +1,4 @@
-import { Faculty } from './types.ts';
+import { Faculty } from './types.js';
 /**
 * Список факультетів університету.
 * @category Schedule

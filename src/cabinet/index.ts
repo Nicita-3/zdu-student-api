@@ -1,2 +1,2 @@
-export * from "./sesId.ts";
-export * from "./types.ts";
+export * from "./sesId.js";
+export * from "./types.js";

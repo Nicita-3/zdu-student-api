@@ -1,6 +1,6 @@
 {
   "name": "zdu-student-api",
-  "version": "1.1.2",
+  "version": "1.1.5",
   "description": "API client for ZDU student services",
   "author": "Nicita3 <ni596157@gmail.com> (https://github.com/Nicita-3)",
   "main": "dist/index.js",
@@ -14,10 +14,6 @@
     "docs": "typedoc --out docs src",
     "test": "node --loader ts-node/esm src/examples.ts",
     "publish:all": "npm run build && npm run docs && npm publish"
-  },
-  "exports": {
-    ".": "./dist/index.js",
-    "./schedule": "./dist/schedule/index.js"
   },
   "license": "MIT",
   "repository": {

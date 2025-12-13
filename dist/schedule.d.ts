@@ -1,4 +1,4 @@
-import { BaseLesson, DetailedLesson, Faculty, ScheduleTypes } from './types.ts';
+import { BaseLesson, DetailedLesson, Faculty, ScheduleTypes } from './types.js';
 /**
  * Клас розкладу
  * @category Schedule

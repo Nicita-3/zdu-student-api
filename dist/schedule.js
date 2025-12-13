@@ -1,8 +1,6 @@
 import iconv from 'iconv-lite';
 import fetch from 'cross-fetch';
 import { faculties } from './constants.js';
-import { BaseLesson, DetailedLesson, Faculty, ScheduleTypes } from './types.js';
-
 /**
  * Клас розкладу
  * @category Schedule
@@ -13,41 +11,34 @@ export class Schedule {
     *
     * Типи: group, teacher, room.
     */
-    public type: ScheduleTypes = 'group';
-
+    type = 'group';
     /**
     * Група
     */
-    public group: string = '';
-
+    group = '';
     /**
     * Id групи
     */
-    public groupId?: number;
-
+    groupId;
     /**
     * Викладач
     */
-    public teacher: string = '';
-
+    teacher = '';
     /**
     * Id викладача
     */
-    public teacherId?: number;
-
+    teacherId;
     /**
     * Аудиторія
     */
-    public room: string = '';
-
+    room = '';
     /**
     * Id аудиторії
     */
-    public roomId?: number;
-
+    roomId;
     /**
      * Факультет.
-     * 
+     *
      * @example
      * Можна призначити одну з констант з `faculties`, наприклад:
      * ```ts
@@ -56,50 +47,42 @@ export class Schedule {
      * console.log(schedule.faculty.name); // 'Фізико-математичний факультет'
      * ```
      */
-    public faculty: Faculty = faculties.none;
-
+    faculty = faculties.none;
     /**
     * Курс
-    * 
+    *
     * `0` - не вибрано
     */
-    public course: 0 | 1 | 2 | 3 | 4 | 5 | 6 = 0;
-
+    course = 0;
     /**
     * Початкова дата розкладу
     */
-    public beginDate: Date = new Date();
-
+    beginDate = new Date();
     /**
     * Кінцева дата розкладу (за промовчанням +7 днів)
     */
-    public endDate: Date = new Date(this.beginDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-
+    endDate = new Date(this.beginDate.getTime() + 7 * 24 * 60 * 60 * 1000);
     /**
     * Показувати пусті дні - false
     */
-    public showEmpty: boolean = false;
-
+    showEmpty = false;
     /**
      * false - сформований текст (за промовчанням)
      * true - окремі стовпчики
      */
-    private _rosText: boolean = false;
-
+    _rosText = false;
     /**
      * Показувати повний склад потоку (тільки для rosText=true)
      */
-    public allStreamComponents: boolean = false;
-
-    public set rosText(value: boolean) {
+    allStreamComponents = false;
+    set rosText(value) {
         this._rosText = value;
-        if (!value) this.allStreamComponents = false;
+        if (!value)
+            this.allStreamComponents = false;
     }
-
-    public get rosText(): boolean {
+    get rosText() {
         return this._rosText;
     }
-
     /**
     * Повертає список пар (розклад)
     *
@@ -124,7 +107,7 @@ export class Schedule {
     * ```
     *
     * @remarks
-    * У `err.message` може повертатися простий текст помилки, 
+    * У `err.message` може повертатися простий текст помилки,
     * або об’єкт у форматі:
     * ```JSON
     * {
@@ -132,37 +115,37 @@ export class Schedule {
     *   "errorcode": "Код помилки"
     * }
     * ```
-    * 
+    *
     * Де:
     * - `error_message` - текст помилки відповідно до {@link scheduleErrors}
     * - `errorcode` - код помилки відповідно до {@link scheduleErrors}
     */
-    public async getSchedule(): Promise<DetailedLesson[] | BaseLesson[]> {
+    async getSchedule() {
         const beginDate = this.beginDate.toLocaleDateString('uk-UA', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
-            });
+        });
         const endDate = this.endDate.toLocaleDateString('uk-UA', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
         });
-        let id: number | string | undefined = (this.type === 'group' ? this.groupId : this.type === 'teacher' ? this.teacherId : this.roomId);
-        if (!id) id = '';
-        let name: string = (this.type === 'group' ? this.group : this.type === 'teacher' ? this.teacher : this.room);
+        let id = (this.type === 'group' ? this.groupId : this.type === 'teacher' ? this.teacherId : this.roomId);
+        if (!id)
+            id = '';
+        let name = (this.type === 'group' ? this.group : this.type === 'teacher' ? this.teacher : this.room);
         name = this.encodeCP1251(name);
-
         const response = await fetch(`https://dekanat.zu.edu.ua/cgi-bin/timetable_export.cgi?req_type=rozklad&req_mode=${this.type}&OBJ_ID=${id}&OBJ_name=${name}&dep_name=&begin_date=${beginDate}&end_date=${endDate}&ros_text=${this.rosText ? 'separated' : 'united'}${this.showEmpty ? '' : '&show_empty=yes'}${this.allStreamComponents ? '' : '&all_stream_components=yes'}&req_format=json&coding_mode=UTF8&bs=%D1%F4%EE%F0%EC%F3%E2%E0%F2%E8+%E7%E0%EF%E8%F2`);
-        if (!response.ok) throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
-        const data: any = await response.json();
+        if (!response.ok)
+            throw new Error(`HTTP error ${response.status}: ${response.statusText}`);
+        const data = await response.json();
         if (data.psrozklad_export.code !== '0') {
             throw new Error(JSON.stringify(data.psrozklad_export.error) || "Unknown error");
         }
         return data.psrozklad_export.roz_items;
     }
-
-    private encodeCP1251(str: string) {
+    encodeCP1251(str) {
         const buf = iconv.encode(str, 'win1251');
         return Array.from(buf).map(b => '%' + b.toString(16).toUpperCase().padStart(2, '0')).join('');
     }

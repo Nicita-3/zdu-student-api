@@ -1,4 +1,4 @@
-import { Teacher } from "../types.ts";
+import { Teacher } from "../types.js";
 /**
 * Повертає список викладачів
 * @category Utility

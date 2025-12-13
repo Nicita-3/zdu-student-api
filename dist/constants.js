@@ -1,9 +1,7 @@
-import { Faculty } from './types.js';
-
 /**
 * Список факультетів університету.
 * @category Schedule
-* 
+*
 * @remarks
 * - `none`: { id: 0, name: 'Оберіть факультет' }
 * - `physicsMath`: { id: 1001, name: 'Фізико-математичний факультет' }
@@ -19,7 +17,7 @@ import { Faculty } from './types.js';
 * - `postgraduate`: { id: 1011, name: 'Відділ аспірантури та докторантури' }
 * - `scientificLyceum`: { id: 1012, name: 'Науковий ліцей' }
 */
-export const faculties: Record<string, Faculty> = {
+export const faculties = {
     none: { id: 0, name: 'Оберіть факультет' },
     physicsMath: { id: 1001, name: 'Фізико-математичний факультет' },
     philologyJournalism: { id: 1002, name: 'Навчально-науковий інститут філології та журналістики' },
@@ -34,7 +32,6 @@ export const faculties: Record<string, Faculty> = {
     postgraduate: { id: 1011, name: 'Відділ аспірантури та докторантури' },
     scientificLyceum: { id: 1012, name: 'Науковий ліцей' }
 };
-
 /**
 * Список помилок для розкладу.
 * @category Schedule
@@ -58,7 +55,7 @@ export const faculties: Record<string, Faculty> = {
 * - -2: Перегляд розкладу заблоковано адміністратором (Розклад у процесі складання і ще не готовий для демонстрації)
 * - -1: Розклад у базі відсутній
 */
-export const scheduleErrors: Record<number, string> = {
+export const scheduleErrors = {
     [-200]: 'Не має доступу до сервера або помилка доступу до бази даних',
     [-100]: 'Помилка у роботі модуля, зверніться до розробника',
     [-90]: 'Об`єкт, для якого потрібно показати розклад, не знайдено',
@@ -73,7 +70,6 @@ export const scheduleErrors: Record<number, string> = {
     [-2]: 'Перегляд розкладу заблоковано адміністратором (Розклад у процесі складання і ще не готовий для демонстрації)',
     [-1]: 'Розклад у базі відсутній'
 };
-
 /**
 * Тип розкладу.
 * @category Schedule
@@ -81,17 +77,16 @@ export const scheduleErrors: Record<number, string> = {
 * @remarks
 * Типи: group, teacher, room.
 */
-export const scheduleTypes: Record<string, string> = {
+export const scheduleTypes = {
     group: 'group',
     teacher: 'teacher',
     room: 'room',
-}
-
+};
 /**
 * Блоки
 * @category Audience
 */
-export const blocks: Record<string, string> = {
+export const blocks = {
     block_1: '№1',
     block_2: '№2',
     block_3: '№3',
@@ -102,4 +97,4 @@ export const blocks: Record<string, string> = {
     hostel_3: 'гуртож №3',
     hostel_4: 'гуртож №4',
     hostel_5: 'гуртож №5',
-}
+};

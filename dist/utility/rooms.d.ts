@@ -1,4 +1,4 @@
-import { Room } from "../types.ts";
+import { Room } from "../types.js";
 /**
 * Повертає список аудиторій
 * @category Utility

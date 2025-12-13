@@ -1,6 +1,6 @@
 import iconv from 'iconv-lite';
 import fetch from 'cross-fetch';
-import { AudienceRoom, Blocks } from './types.ts';
+import { AudienceRoom, Blocks } from './types.js';
 
 /**
  * Клас розкладу

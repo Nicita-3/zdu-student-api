@@ -1,4 +1,4 @@
-import { Dop } from "../types.ts";
+import { Dop } from "../types.js";
 /**
 * Повертає список доп. обладнання аудиторій
 * @category Utility
