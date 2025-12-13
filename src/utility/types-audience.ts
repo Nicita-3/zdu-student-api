@@ -1,4 +1,5 @@
 import { TypeAudience } from "../types.ts";
+import fetch from 'cross-fetch';
 
 /**
 * Повертає список типів аудиторій

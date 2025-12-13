@@ -1,4 +1,5 @@
 import { Dop } from "../types.ts";
+import fetch from 'cross-fetch';
 
 /**
 * Повертає список доп. обладнання аудиторій

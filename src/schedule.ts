@@ -1,5 +1,5 @@
 import iconv from 'iconv-lite';
-import fetch from 'node-fetch';
+import fetch from 'cross-fetch';
 import { faculties } from './constants.ts';
 import { BaseLesson, DetailedLesson, Faculty, ScheduleTypes } from './types.ts';
 

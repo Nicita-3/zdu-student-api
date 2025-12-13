@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+import fetch from 'cross-fetch';
 import iconv from "iconv-lite";
 import { SessionData } from "./types";
 
@@ -17,7 +17,7 @@ export async function getSesId(family: string, password: string): Promise<Sessio
       "https://dekanat.zu.edu.ua/cgi-bin/classman.cgi?n=1&ts=16161",
       {
         method: "POST",
-        body: encodedFormData,
+        body: new Uint8Array(encodedFormData),
         redirect: "manual",
       }
     );

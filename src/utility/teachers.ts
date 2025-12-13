@@ -1,4 +1,5 @@
 import { Teacher } from "../types.ts";
+import fetch from 'cross-fetch';
 
 /**
 * Повертає список викладачів

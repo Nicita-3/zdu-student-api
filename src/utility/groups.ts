@@ -1,4 +1,5 @@
 import { Group } from "../types.ts";
+import fetch from 'cross-fetch';
 
 /**
 * Повертає список груп

@@ -1,4 +1,5 @@
 import { Room } from "../types.ts";
+import fetch from 'cross-fetch';
 
 /**
 * Повертає список аудиторій

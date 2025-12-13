@@ -52,4 +52,4 @@ try {
 
 //console.log((await getDops()));
 
-// console.log((await getSesId("FFFFF", "123456789")))
+console.log((await getSesId("FFFFF", "123456789")))
