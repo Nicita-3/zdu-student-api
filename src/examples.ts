@@ -6,6 +6,7 @@ import { getTeachers } from "./utility/teachers.ts";
 import { Audience } from "./audience.ts";
 import { getTypesAudience } from "./utility/types-audience.ts";
 import { getDops } from "./utility/dops.ts";
+import { getSesId } from "./cabinet/index.ts";
 
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -38,14 +39,17 @@ import { getDops } from "./utility/dops.ts";
 // console.log((await getRooms('319')))
 
 
-// const audience = new Audience();
-// try {
-//     const audiences = await audience.getAudience();
-//     console.log("Аудиторії:", audiences);
-// } catch (err: any) {
-//     console.error(err.message);
-// }
+const audience = new Audience();
+audience.blockName = "гуртож №3"
+try {
+    const audiences = await audience.getAudience();
+    console.log("Аудиторії:", audiences);
+} catch (err: any) {
+    console.error(err.message);
+}
 
 // console.log((await getTypesAudience('Ле')));
 
 //console.log((await getDops()));
+
+// console.log((await getSesId("FFFFF", "123456789")))

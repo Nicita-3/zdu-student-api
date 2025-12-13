@@ -7,3 +7,4 @@ export * from "./utility/teachers.ts";
 export * from "./audience.ts";
 export * from "./utility/types-audience.ts";
 export * from "./utility/dops.ts";
+export * from "./cabinet/index.ts";
