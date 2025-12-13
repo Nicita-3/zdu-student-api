@@ -36,13 +36,13 @@ npm install zdu-student-api
 import { Schedule, scheduleErrors } from 'zdu-student-api';
 
 const schedule = new Schedule();
-schedule.group = '23Бд-СОінф123';
+schedule.group = '23Бд-СОінф';
 schedule.type = 'group';
 schedule.rosText = true;
 schedule.allStreamComponents = true;
 
 try {
-  const sc = await extraction await schedule.getSchedule();
+  const sc = await schedule.getSchedule();
   console.log('Розклад:', sc);
 } catch (err: any) {
   console.error(err.message);
