@@ -1,6 +1,6 @@
 {
   "name": "zdu-student-api",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "API client for ZDU student services",
   "author": "Nicita3 <ni596157@gmail.com> (https://github.com/Nicita-3)",
   "main": "dist/index.js",
@@ -23,6 +23,7 @@
   "homepage": "https://nicita-3.github.io/zdu-student-api",
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "prettier": "^3.7.4",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.14",
     "typescript": "^5.9.3"

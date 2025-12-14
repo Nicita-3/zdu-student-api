@@ -1,35 +1,35 @@
 /**
  * Факультет
  * @category Schedule
- * 
+ *
  * @remarks
  * - `id` — Числовий ідентифікатор факультету
  * - `name` — Повна назва факультету
  */
 export interface Faculty {
-  name: string;
-  id: number;
+    name: string;
+    id: number;
 }
 
 /**
  * Група
  * @category Schedule
- * 
+ *
  * @remarks
  * - `name` — Повна назва групи
  * - `id` — Ідентифікатор групи
  * - `faculty` — Повна назва факультету
  */
 export interface Group {
-  name: string;
-  id: string;
-  faculty: string;
+    name: string;
+    id: string;
+    faculty: string;
 }
 
 /**
  * Викладач
  * @category Schedule
- * 
+ *
  * @remarks
  * - `name` — Ім'я викладача в форматі Прізвище І.П.
  * - `id` — Ідентифікатор викладача
@@ -39,22 +39,22 @@ export interface Group {
  * - `lastname` — По батькові
  */
 export interface Teacher {
-  name: string;
-  id: string;
-  faculty: string;
-  surname: string;
-  firstname: string;
-  lastname: string;
-};
+    name: string;
+    id: string;
+    faculty: string;
+    surname: string;
+    firstname: string;
+    lastname: string;
+}
 
 /**
  * Аудиторія
  * @category Schedule
- * 
+ *
  * @remarks
  * - `name` — Назва аудиторії
  * - `id` — Ідентифікатор аудиторії
- * - `block` — Назва блоку (гуртожиток/корпус), до якого належить аудиторія 
+ * - `block` — Назва блоку (гуртожиток/корпус), до якого належить аудиторія
  */
 export interface Room {
     name: string;
@@ -63,16 +63,16 @@ export interface Room {
 }
 
 /**
-* Типи для отримання розкладу.
-* @category Schedule
-* 
-*/
+ * Типи для отримання розкладу.
+ * @category Schedule
+ *
+ */
 export type ScheduleTypes = 'group' | 'teacher' | 'room';
 
 /**
  * Базова інформація про заняття
  * @category Schedule
- * 
+ *
  * @remarks
  * - `object` — Назва групи, аудиторія, викладач
  * - `date` — Дата проведення заняття у форматі DD.MM.YYYY
@@ -84,21 +84,21 @@ export type ScheduleTypes = 'group' | 'teacher' | 'room';
  * - `stream_components` — ID груп потоку (цифрові коди), через кому
  */
 export interface BaseLesson {
-  object: string;
-  date: string;
-  comment: string;
-  lesson_number: string;
-  lesson_name: string;
-  lesson_time: string;
-  lesson_description?: string;
-  stream_components?: string;
+    object: string;
+    date: string;
+    comment: string;
+    lesson_number: string;
+    lesson_name: string;
+    lesson_time: string;
+    lesson_description?: string;
+    stream_components?: string;
 }
 
 /**
  * Детальна інформація про заняття
  * Розділена на окремі поля (rosText = true)
  * @category Schedule
- * 
+ *
  * @remarks
  * - `half` — Номер підгрупи
  * - `teacher` — Основний викладач
@@ -113,24 +113,24 @@ export interface BaseLesson {
  * - `link` — Посилання на онлайн-заняття
  */
 export interface DetailedLesson extends BaseLesson {
-  half: string;
-  teacher: string;
-  teachers_add: string;
-  room: string;
-  group: string;
-  title: string;
-  type: string;
-  replacement: string;
-  reservation: string;
-  online: string;
-  comment4link: string;
-  link: string;
+    half: string;
+    teacher: string;
+    teachers_add: string;
+    room: string;
+    group: string;
+    title: string;
+    type: string;
+    replacement: string;
+    reservation: string;
+    online: string;
+    comment4link: string;
+    link: string;
 }
 
 /**
  * Аудиторія
  * @category Audience
- * 
+ *
  * @remarks
  * - `name` — Назва аудиторії
  * - `block` — Назва блоку
@@ -139,32 +139,43 @@ export interface DetailedLesson extends BaseLesson {
  * - `comment` — Коментар до аудиторії
  */
 export interface AudienceRoom {
-  name: string;
-  block: string;
-  type: string;
-  places: string;
-  comment: string;
+    name: string;
+    block: string;
+    type: string;
+    places: string;
+    comment: string;
 }
 
 /**
-* Блоки
-* @category Audience
-*/
-export type Blocks = '' | '№1' | '№2' | '№3' | '№4' | '№5' | 'гуртож №1' | 'гуртож №2' | 'гуртож №3' | 'гуртож №4' | 'гуртож №5';
+ * Блоки
+ * @category Audience
+ */
+export type Blocks =
+    | ''
+    | '№1'
+    | '№2'
+    | '№3'
+    | '№4'
+    | '№5'
+    | 'гуртож №1'
+    | 'гуртож №2'
+    | 'гуртож №3'
+    | 'гуртож №4'
+    | 'гуртож №5';
 
 /**
-* Тип аудиторії
-* @category Audience
-*/
+ * Тип аудиторії
+ * @category Audience
+ */
 export interface TypeAudience {
-  full: string;
-  short: string;
+    full: string;
+    short: string;
 }
 
 /**
-* Доп. обладнання
-* @category Audience
-*/
+ * Доп. обладнання
+ * @category Audience
+ */
 export interface Dop {
-  name: string;
+    name: string;
 }
