@@ -50,7 +50,7 @@ export interface SessionData {
  * - `studyDuration` — Термін навчання (наприклад: "4 роки")
  * - `graduationDate` — Дата закінчення навчання (формат: DD.MM.YYYY)
  */
-export interface QuestionnaireData {
+export interface Data {
     ok: boolean;
     // ПІБ студента
     fullName?: string;
@@ -79,4 +79,82 @@ export interface QuestionnaireData {
     enrollmentDate?: string;
     studyDuration?: string;
     graduationDate?: string;
+}
+
+/**
+ * name та prId дисципліни
+ * @category Cabinet
+ * @remarks
+ * - `name` — Повна назва дисципліни
+ * - `prId` — Айді дисципліни
+ */
+export interface Discipline {
+    name: string;
+    prId: string;
+}
+
+/**
+ * name та prId дисципліни
+ * @category Cabinet
+ * @remarks
+ * - `ok` — Успіх отримання токену
+ * - `disciplines` — Масив дисциплін {@link Discipline}
+ */
+export interface Disciplines {
+    ok: boolean;
+    disciplines: Discipline[];
+}
+
+/**
+ * Опис заняття у кабінеті студента
+ * @category Cabinet
+ * @remarks
+ * - `teacher` — Прізвище та ініціали викладача
+ * - `date` — Дата заняття у форматі "dd.mm.yyyy"
+ * - `type` — Тип заняття: "Лек", "ПрСем", "Лаб", "МК", "Екз"
+ * - `time` — Час заняття у форматі "HH:MM-HH:MM"
+ * - `index` — Значення атрибута `data-ind`, унікальний ідентифікатор
+ */
+export interface ScheduleItem {
+    teacher: string;
+    date: string;
+    type: string;
+    time: string;
+    index: string;
+}
+
+/**
+ * Список оцінок студента.
+ * @category Cabinet
+ * @remarks
+ * - `id` — Унікальний ідентифікатор студента
+ * - `scores` — Оцінки по днях, масив масивів рядків (перший елемент - основна оцінка, другий елемент - оцінка перездачі)
+ * - `absences` — Кількість пропусків
+ * - `uabsences` — Кількість невиправлених пропусків
+ * - `finalScore` — Фінальна оцінка
+ */
+export interface StudentScores {
+    id: string;
+    scores: string[][];
+    absences: number;
+    uabsences: number;
+    finalScore: string;
+}
+
+/**
+ * Об'єкт оцінок з предмету.
+ * @category Cabinet
+ * @remarks
+ * - `ok` — Успіх отримання токену
+ * - `prId` — Айді дисципліни
+ * - `studentId` — Унікальний айді студента для предметів
+ * - `scheduleItem` — Опис заняття у кабінеті студента {@link ScheduleItem}
+ * - `studentScores` — Список оцінок студента {@link StudentScores}
+ */
+export interface Scores {
+    ok: boolean;
+    prId: string;
+    studentId: string;
+    scheduleItem: ScheduleItem[];
+    studentScores: StudentScores[];
 }

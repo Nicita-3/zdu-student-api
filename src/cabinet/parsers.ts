@@ -1,10 +1,10 @@
-import { QuestionnaireData } from './types';
+import { Discipline, Data } from './types.js';
 
 /**
  * Парсить дані з сторінки n=31 (анкетні дані)
  */
-export function parseQuestionnairePageN31(html: string): Partial<QuestionnaireData> {
-    const data: Partial<QuestionnaireData> = {};
+export function parseDataPageN31(html: string): Partial<Data> {
+    const data: Partial<Data> = {};
     const fullName = extractFullName(html);
     if (fullName) {
         data.fullName = fullName;
@@ -35,8 +35,8 @@ export function parseQuestionnairePageN31(html: string): Partial<QuestionnaireDa
 /**
  * Парсить дані з сторінки n=3 (загальна інформація)
  */
-export function parseQuestionnairePageN3(html: string): Partial<QuestionnaireData> {
-    const data: Partial<QuestionnaireData> = {};
+export function parseDataPageN3(html: string): Partial<Data> {
+    const data: Partial<Data> = {};
     const extractFromParagraph = (label: string): string | undefined => {
         const labelIdx = html.indexOf(label);
         if (labelIdx === -1) return undefined;
@@ -139,4 +139,47 @@ function parseFullName(fullName: string): {
         firstName: parts[1],
         middleName: parts.slice(2).join(' '),
     };
+}
+
+/**
+ * Парсить сторінку "Семестрові бали" (n=6)
+ * і повертає список дисциплін
+ */
+export function parseDisciplinesPageN6(html: string): Discipline[] {
+    const result: Discipline[] = [];
+    const rowRegex =
+        /<tr>\s*<td>([^<]+)<\/td>\s*<td>\d+<\/td>\s*<td>[\s\S]*?<a[^>]+href="[^"]*prID=(\d+)[^"]*"[\s\S]*?<\/a>[\s\S]*?<\/td>\s*<\/tr>/gi;
+
+    let match: RegExpExecArray | null;
+
+    while ((match = rowRegex.exec(html)) !== null) {
+        const name = match[1].trim();
+        const prId = match[2].trim();
+
+        if (name && prId) {
+            result.push({ name, prId });
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Парсить HTML і повертає масив дисциплін (n=7)
+ * @param html - HTML сторінки з select[id="prt"]
+ */
+export function parseDisciplinesPageN7(html: string): Discipline[] {
+    const disciplines: Discipline[] = [];
+    const optionRegex = /<option\s+value="(\d+)">([\s\S]*?)<\/option>/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = optionRegex.exec(html)) !== null) {
+        const value = match[1];
+        const name = match[2].trim();
+        if (value !== '-1') {
+            disciplines.push({ prId: value, name });
+        }
+    }
+
+    return disciplines;
 }

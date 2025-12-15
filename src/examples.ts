@@ -1,11 +1,11 @@
-import { Schedule, scheduleErrors } from './index.js';
+import { Discipline, getСurrentDisciplines, Schedule, scheduleErrors } from './index.js';
 import { getGroups } from './utility/groups.js';
 import { getRooms } from './utility/rooms.js';
 import { getTeachers } from './utility/teachers.js';
 import { Audience } from './audience.js';
 import { getTypesAudience } from './utility/types-audience.js';
 import { getDops } from './utility/dops.js';
-import { getQuestionnaireData, getSesId } from './cabinet/index.js';
+import { Cabinet, getDisciplines, getData, getScores, getSesId, Scores } from './index.js';
 
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -51,6 +51,54 @@ import { getQuestionnaireData, getSesId } from './cabinet/index.js';
 //console.log((await getDops()));
 
 // console.log((await getSesId("FFFFF", "123456789")))
-const { sesID, sessGUID } = await getSesId('LOGIN', 'PASSWORD');
-const data = await getQuestionnaireData(sesID, sessGUID);
-console.log(data);
+
+// console.log(cb.data);
+// console.log(cb.disciplines);
+// const { sesID, sessGUID } = await getSesId('LOGIN', 'PASSWORD');
+// console.log(sesID, sessGUID);
+// const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
+// const sessGUID = '20225423078dcb37d97904b76ba534af';
+// const data = await getData(sesID, sessGUID);
+// const data = await getDisciplines(sesID, sessGUID);
+// const data = await getСurrentDisciplines(sesID, sessGUID);
+// console.log(data);
+// const data2 = await getScores(sesID, sessGUID, '43910', 0);
+// // console.log(data2);
+// const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
+
+const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
+const sessGUID = '20225423078dcb37d97904b76ba534af';
+const cb = new Cabinet('LOGIN', 'PASSWORD');
+// await cb.auth();
+
+await cb.setSession(sesID, sessGUID);
+// console.log(cb.sesID, cb.sessGUID);
+console.log(await cb.loadData());
+// console.log(cb.allScores);
+printFinalScores(cb.allScores!, cb.disciplines);
+
+function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
+    // Створюємо мапу prId → name для швидкого доступу
+    const disciplineMap: Record<string, string> = {};
+    for (const d of disciplines) {
+        disciplineMap[d.prId] = d.name;
+    }
+
+    const result: Record<string, Record<string, string>> = {};
+
+    for (const scoresObj of scoresArray) {
+        const disciplineId = scoresObj.prId;
+        const disciplineName = disciplineMap[disciplineId] ?? disciplineId;
+        for (const student of scoresObj.studentScores) {
+            if (!result[student.id]) result[student.id] = {};
+            result[student.id][disciplineName] = student.finalScore;
+        }
+    }
+
+    for (const studentId in result) {
+        console.log(`Student ${studentId}:`);
+        for (const disciplineName in result[studentId]) {
+            console.log(`  ${disciplineName}: ${result[studentId][disciplineName]}`);
+        }
+    }
+}
