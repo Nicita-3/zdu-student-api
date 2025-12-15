@@ -5,13 +5,14 @@ import { SessionData } from './types.js';
 /**
  * Отримати sesID та sessGUID користувача
  * @category Cabinet
- * @param family - прізвище користувача
+ * @param login - прізвище користувача
  * @param password - пароль
+ * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
  * @returns Об'єкт { sesID, sessGUID }
  */
-export async function getSesId(family: string, password: string): Promise<SessionData> {
+export async function getSesId(login: string, password: string): Promise<SessionData> {
     try {
-        const formData = `user_name=${family}&user_pwd=${password}&n=1&rout=&t=16161`;
+        const formData = `user_name=${login}&user_pwd=${password}&n=1&rout=&t=16161`;
         const encodedFormData = iconv.encode(formData, 'windows-1251');
         const response = await fetch(
             'https://dekanat.zu.edu.ua/cgi-bin/classman.cgi?n=1&ts=16161',
