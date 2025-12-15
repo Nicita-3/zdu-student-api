@@ -59,10 +59,10 @@ export interface Room {
     block: string;
 }
 /**
-* Типи для отримання розкладу.
-* @category Schedule
-*
-*/
+ * Типи для отримання розкладу.
+ * @category Schedule
+ *
+ */
 export type ScheduleTypes = 'group' | 'teacher' | 'room';
 /**
  * Базова інформація про заняття
@@ -139,22 +139,22 @@ export interface AudienceRoom {
     comment: string;
 }
 /**
-* Блоки
-* @category Audience
-*/
+ * Блоки
+ * @category Audience
+ */
 export type Blocks = '' | '№1' | '№2' | '№3' | '№4' | '№5' | 'гуртож №1' | 'гуртож №2' | 'гуртож №3' | 'гуртож №4' | 'гуртож №5';
 /**
-* Тип аудиторії
-* @category Audience
-*/
+ * Тип аудиторії
+ * @category Audience
+ */
 export interface TypeAudience {
     full: string;
     short: string;
 }
 /**
-* Доп. обладнання
-* @category Audience
-*/
+ * Доп. обладнання
+ * @category Audience
+ */
 export interface Dop {
     name: string;
 }
