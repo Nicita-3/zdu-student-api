@@ -1,17 +1,14 @@
-import { Discipline, Data } from './types.js';
-
 /**
  * Парсить дані з сторінки n=31 (анкетні дані)
  */
-export function parseDataPageN31(html: string): Partial<Data> {
-    const data: Partial<Data> = {};
+export function parseDataPageN31(html) {
+    const data = {};
     const fullName = extractFullName(html);
     if (fullName) {
         data.fullName = fullName;
         const nameParts = parseFullName(fullName);
         Object.assign(data, nameParts);
     }
-
     data.birthDate = extractStrongValue(html, 'Дата народження');
     data.gender = extractStrongValue(html, 'Стать');
     data.previousFullName = extractStrongValue(html, 'Попереднє ПІБ студента');
@@ -20,7 +17,6 @@ export function parseDataPageN31(html: string): Partial<Data> {
     data.firstNameEng = extractStrongValue(html, 'Ім`я англ.');
     data.middleNameEng = extractStrongValue(html, 'По батькові англ.');
     data.email = extractStrongValue(html, 'E-mail:');
-
     const phonesStr = extractStrongValue(html, 'Телефон(и)');
     if (phonesStr) {
         data.phones = phonesStr
@@ -28,25 +24,27 @@ export function parseDataPageN31(html: string): Partial<Data> {
             .map((p) => p.trim())
             .filter((p) => p.length > 0);
     }
-
     return data;
 }
-
 /**
  * Парсить дані з сторінки n=3 (загальна інформація)
  */
-export function parseDataPageN3(html: string): Partial<Data> {
-    const data: Partial<Data> = {};
-    const extractFromParagraph = (label: string): string | undefined => {
+export function parseDataPageN3(html) {
+    const data = {};
+    const extractFromParagraph = (label) => {
         const labelIdx = html.indexOf(label);
-        if (labelIdx === -1) return undefined;
+        if (labelIdx === -1)
+            return undefined;
         const pStart = html.lastIndexOf('<p>', labelIdx);
-        if (pStart === -1) return undefined;
+        if (pStart === -1)
+            return undefined;
         const pEnd = html.indexOf('</p>', labelIdx);
-        if (pEnd === -1) return undefined;
+        if (pEnd === -1)
+            return undefined;
         const pContent = html.substring(pStart, pEnd);
         const strongMatch = pContent.match(/<strong>([^<]+)<\/strong>/);
-        if (!strongMatch) return undefined;
+        if (!strongMatch)
+            return undefined;
         const value = strongMatch[1].trim();
         return value.length > 0 ? value : undefined;
     };
@@ -57,13 +55,12 @@ export function parseDataPageN3(html: string): Partial<Data> {
         const pEnd = html.indexOf('</p>', specialtyPIdx);
         if (pStart !== -1 && pEnd !== -1) {
             const pContent = html.substring(pStart, pEnd);
-            const specialtyMatch =
-                pContent.match(/<strong>"([^"]+)"<\/strong>/) ||
+            const specialtyMatch = pContent.match(/<strong>"([^"]+)"<\/strong>/) ||
                 pContent.match(/<strong>([^<]+)<\/strong>/);
-            if (specialtyMatch) data.specialty = specialtyMatch[1].trim();
+            if (specialtyMatch)
+                data.specialty = specialtyMatch[1].trim();
         }
     }
-
     data.degree = extractFromParagraph('Ступінь / Освітньо-професійний ступінь');
     data.group = extractFromParagraph('Группа');
     data.studyForm = extractFromParagraph('Форма навчання');
@@ -76,102 +73,88 @@ export function parseDataPageN3(html: string): Partial<Data> {
         const pEnd = html.indexOf('</p>', orderIdx);
         if (pStart !== -1 && pEnd !== -1) {
             const pContent = html.substring(pStart, pEnd);
-            const orderMatch = pContent.match(
-                /Наказ на зарахування\s+<strong>([^<]+)<\/strong>\s+від\s+<strong>([^<]+)<\/strong>/,
-            );
+            const orderMatch = pContent.match(/Наказ на зарахування\s+<strong>([^<]+)<\/strong>\s+від\s+<strong>([^<]+)<\/strong>/);
             if (orderMatch) {
                 data.enrollmentOrder = orderMatch[1].trim();
                 data.enrollmentDate = orderMatch[2].trim();
             }
         }
     }
-
     return data;
 }
-
 /**
  * Витягує значення з HTML після label до кінця li тегу
  */
-function extractStrongValue(html: string, label: string): string | undefined {
+function extractStrongValue(html, label) {
     const labelIdx = html.indexOf(label);
-    if (labelIdx === -1) return undefined;
+    if (labelIdx === -1)
+        return undefined;
     const liStart = html.lastIndexOf('<li>', labelIdx);
-    if (liStart === -1) return undefined;
+    if (liStart === -1)
+        return undefined;
     const liEnd = html.indexOf('</li>', labelIdx);
-    if (liEnd === -1) return undefined;
+    if (liEnd === -1)
+        return undefined;
     const liContent = html.substring(liStart, liEnd);
     const strongMatch = liContent.match(/<strong>(.*?)<\/strong>/);
-    if (!strongMatch) return undefined;
-
+    if (!strongMatch)
+        return undefined;
     const value = strongMatch[1].trim();
     return value.length > 0 ? value : undefined;
 }
-
 /**
  * Витягує повне ім'я з h3 тегу
  */
-function extractFullName(html: string): string | undefined {
+function extractFullName(html) {
     const h2Idx = html.indexOf('<h2>Анкетні дані студента</h2>');
-    if (h2Idx === -1) return undefined;
-
+    if (h2Idx === -1)
+        return undefined;
     const h3Match = html.substring(h2Idx).match(/<h3>([^<]+)<\/h3>/);
-    if (!h3Match) return undefined;
-
+    if (!h3Match)
+        return undefined;
     return h3Match[1].trim();
 }
-
 /**
  * Парсить повне ім'я на прізвище, ім'я та по батькові
  */
-function parseFullName(fullName: string): {
-    lastName?: string;
-    firstName?: string;
-    middleName?: string;
-} {
+function parseFullName(fullName) {
     const parts = fullName.trim().split(/\s+/);
-
-    if (parts.length === 0) return {};
-    if (parts.length === 1) return { lastName: parts[0] };
-    if (parts.length === 2) return { lastName: parts[0], firstName: parts[1] };
-
+    if (parts.length === 0)
+        return {};
+    if (parts.length === 1)
+        return { lastName: parts[0] };
+    if (parts.length === 2)
+        return { lastName: parts[0], firstName: parts[1] };
     return {
         lastName: parts[0],
         firstName: parts[1],
         middleName: parts.slice(2).join(' '),
     };
 }
-
 /**
  * Парсить сторінку "Семестрові бали" (n=6) і повертає список дисциплін
  */
-export function parseDisciplinesPageN6(html: string): Discipline[] {
-    const result: Discipline[] = [];
-    const rowRegex =
-        /<tr>\s*<td>([^<]+)<\/td>\s*<td>\d+<\/td>\s*<td>[\s\S]*?<a[^>]+href="[^"]*prID=(\d+)[^"]*"[\s\S]*?<\/a>[\s\S]*?<\/td>\s*<\/tr>/gi;
-
-    let match: RegExpExecArray | null;
-
+export function parseDisciplinesPageN6(html) {
+    const result = [];
+    const rowRegex = /<tr>\s*<td>([^<]+)<\/td>\s*<td>\d+<\/td>\s*<td>[\s\S]*?<a[^>]+href="[^"]*prID=(\d+)[^"]*"[\s\S]*?<\/a>[\s\S]*?<\/td>\s*<\/tr>/gi;
+    let match;
     while ((match = rowRegex.exec(html)) !== null) {
         const name = match[1].trim();
         const prId = match[2].trim();
-
         if (name && prId) {
             result.push({ name, prId });
         }
     }
-
     return result;
 }
-
 /**
  * Парсить HTML і повертає масив дисциплін (n=7)
  * @param html - HTML сторінки з select[id="prt"]
  */
-export function parseDisciplinesPageN7(html: string): Discipline[] {
-    const disciplines: Discipline[] = [];
+export function parseDisciplinesPageN7(html) {
+    const disciplines = [];
     const optionRegex = /<option\s+value="(\d+)">([\s\S]*?)<\/option>/g;
-    let match: RegExpExecArray | null;
-
+    let match;
     while ((match = optionRegex.exec(html)) !== null) {
         const value = match[1];
         const name = match[2].trim();
@@ -179,6 +162,5 @@ export function parseDisciplinesPageN7(html: string): Discipline[] {
             disciplines.push({ prId: value, name });
         }
     }
-
     return disciplines;
 }

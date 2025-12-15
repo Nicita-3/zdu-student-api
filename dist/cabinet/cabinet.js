@@ -1,10 +1,8 @@
 import { getSesId } from './sesId.js';
 import { isValidSession } from './validSession.js';
 import { getСurrentDisciplines } from './disciplines.js';
-import { Discipline, Disciplines, Data, Scores } from './types.js';
 import { getData } from './data.js';
 import { getScores } from './scores.js';
-
 /**
  * Клас кабінету студента
  * @category Cabinet
@@ -13,57 +11,48 @@ export class Cabinet {
     /**
      * Прізвище користувача
      */
-    public login: string;
-
+    login;
     /**
      * Пароль від кабінету студента
      */
-    public password: string;
-
+    password;
     /**
      * ID сесії користувача
      */
-    public sesID?: string;
-
+    sesID;
     /**
      * GUID сесії з cookie
      */
-    public sessGUID?: string;
-
+    sessGUID;
     /**
      * Семестр для пошуку оцінок (0 - перший, 1 - другий)
      */
-    public semester: 0 | 1 = 0;
-
+    semester = 0;
     /**
      * Список дисциплін {@link Discipline}
      */
-    public disciplines: Discipline[] = [];
-
+    disciplines = [];
     /**
      * Данні студента {@link Data}
      */
-    public data?: Data;
-
+    data;
     /**
      * Оціки з усіх предметів {@link Scores}
      */
-    public allScores?: Scores[];
-
+    allScores;
     /**
      * Конструктор
      * @param login - Прізвище користувача
      * @param password - Пароль
      */
-    constructor(login: string, password: string) {
+    constructor(login, password) {
         this.login = login;
         this.password = password;
     }
-
     /**
      * Авторизація
      */
-    public async auth(login?: string, password?: string): Promise<boolean> {
+    async auth(login, password) {
         const accountData = await getSesId(login ?? this.login, password ?? this.password);
         this.setSemester();
         if (accountData.ok) {
@@ -73,11 +62,10 @@ export class Cabinet {
         }
         return false;
     }
-
     /**
      * Базове значення семестру
      */
-    private setSemester() {
+    setSemester() {
         const year = new Date().getFullYear();
         const febStart = new Date(year, 1, 1); // лютий = 1
         const sepStart = new Date(year, 8, 1); // вересень = 8
@@ -86,21 +74,19 @@ export class Cabinet {
             this.semester = 1;
         }
     }
-
     /**
      * Отримання всіх данних
      */
-    public async loadData(): Promise<boolean> {
+    async loadData() {
         const one = (await this.getDisciplines()).ok;
         const two = (await this.getData()).ok;
         const three = (await this.getAllScores()).length > 0;
         return one && two && three;
     }
-
     /**
      * Відновлення сесії
      */
-    public async setSession(sesID: string, sessGUID: string): Promise<boolean> {
+    async setSession(sesID, sessGUID) {
         this.setSemester();
         const ses = await isValidSession(sesID, sessGUID);
         if (ses) {
@@ -109,67 +95,67 @@ export class Cabinet {
         }
         return ses;
     }
-
     /**
      * Перевірка валідності сесії
      */
-    public async isValidSession(): Promise<boolean> {
-        if (!this.sesID || !this.sessGUID) return false;
+    async isValidSession() {
+        if (!this.sesID || !this.sessGUID)
+            return false;
         return await isValidSession(this.sesID, this.sessGUID);
     }
-
     /**
      * Отримати дисципліни поточного семестру студента
      * @returns Масив дисциплін {@link Disciplines}
      */
-    public async getDisciplines(): Promise<Disciplines> {
-        if (!this.sesID || !this.sessGUID) return { ok: false, disciplines: [] };
+    async getDisciplines() {
+        if (!this.sesID || !this.sessGUID)
+            return { ok: false, disciplines: [] };
         try {
             const disciplinesData = await getСurrentDisciplines(this.sesID, this.sessGUID);
             if (disciplinesData.ok) {
                 this.disciplines = disciplinesData.disciplines;
             }
             return disciplinesData;
-        } catch {
+        }
+        catch {
             return { ok: false, disciplines: [] };
         }
     }
-
     /**
      * Отримати анкетні данні студента
      * @returns Об'єкт {@link ata}
      */
-    public async getData(): Promise<Data> {
-        if (!this.sesID || !this.sessGUID) return { ok: false };
+    async getData() {
+        if (!this.sesID || !this.sessGUID)
+            return { ok: false };
         try {
             const data = await getData(this.sesID, this.sessGUID);
             if (data.ok) {
                 this.data = data;
             }
             return data;
-        } catch {
+        }
+        catch {
             return { ok: false };
         }
     }
-
     /**
      * Отримати оцінки з всіх предметів
      */
-    public async getAllScores(semester?: 0 | 1): Promise<Scores[]> {
-        if (!this.sesID || !this.sessGUID) return [];
-        if (!this.disciplines?.length) return [];
-
+    async getAllScores(semester) {
+        if (!this.sesID || !this.sessGUID)
+            return [];
+        if (!this.disciplines?.length)
+            return [];
         const targetSemester = semester ?? this.semester;
-
         try {
-            const scorePromises = this.disciplines.map((discipline) =>
-                getScores(this.sesID!, this.sessGUID!, discipline.prId, targetSemester),
-            );
+            const scorePromises = this.disciplines.map((discipline) => getScores(this.sesID, this.sessGUID, discipline.prId, targetSemester));
             const results = await Promise.all(scorePromises);
             const allScores = results.filter((scores) => scores.ok);
             this.allScores = allScores;
             return allScores;
-        } catch {
+        }
+        catch {
             return [];
         }
     }
