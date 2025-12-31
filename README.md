@@ -170,4 +170,4 @@ console.log(sessionId);
 
 ## Ліцензія
 
-MIT © 2025
+MIT © 2026
