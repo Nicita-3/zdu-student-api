@@ -8,7 +8,7 @@ import { parseGroupsPage } from '../cabinet/parsers.js';
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
- * @returns Масив дисциплін {@link Disciplines}
+ * @returns Об'єкт академічних груп {@link AcademicGroups}
  */
 export async function getAcademicGroups(sesId, sessGUID) {
     try {

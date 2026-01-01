@@ -21,7 +21,7 @@ export declare class CabinetStudent {
      */
     sessGUID?: string;
     /**
-     * Семестр для пошуку оцінок 1 - перший, 2 - другий)
+     * Семестр для пошуку оцінок (1 - перший, 2 - другий)
      */
     semester: 1 | 2;
     /**

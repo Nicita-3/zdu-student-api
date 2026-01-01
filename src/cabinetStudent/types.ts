@@ -69,7 +69,7 @@ export interface DataStudent {
 
 /**
  * name та prId дисципліни
- * @category Cabinet
+ * @category CabinetStudent
  * @remarks
  * - `name` — Повна назва дисципліни
  * - `prId` — Айді дисципліни

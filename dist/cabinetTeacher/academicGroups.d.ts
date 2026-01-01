@@ -5,6 +5,6 @@ import { AcademicGroups } from './types.js';
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
- * @returns Масив дисциплін {@link Disciplines}
+ * @returns Об'єкт академічних груп {@link AcademicGroups}
  */
 export declare function getAcademicGroups(sesId: string, sessGUID: string): Promise<AcademicGroups>;

@@ -2,9 +2,8 @@
  * Отримати ймовірний семестр поточної дати
  * @category Cabinet
  * @remarks
- * - `ok` — Успіх отримання токену
- * - `sesID` — ID сесії користувача
- * - `sessGUID` — GUID сесії з cookie
+ * З 2 вересня по кінець січня - перший семестр
+ * З 1 лютого по 1 вересня - другий семестр
  */
 export function getSemester() {
     const year = new Date().getFullYear();
