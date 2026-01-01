@@ -6,6 +6,7 @@ import { Audience } from './audience.js';
 import { getTypesAudience } from './utility/types-audience.js';
 import { getDops } from './utility/dops.js';
 import { Cabinet, getDisciplines, getData, getScores, getSesId, Scores } from './index.js';
+import 'dotenv/config';
 
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -33,9 +34,9 @@ import { Cabinet, getDisciplines, getData, getScores, getSesId, Scores } from '.
 //     console.error(err.message);
 // }
 
-//console.log((await getGroups('25Бд-Комп'))) // -3158
-// console.log((await getTeachers('Кривонос Олександр')))
-// console.log((await getRooms('319')))
+// console.log(await getGroups('25Бд-Комп')); // -3158
+// console.log(await getTeachers('Кривонос Олександр'));
+// console.log(await getRooms('319'));
 
 // const audience = new Audience();
 // audience.blockName = "гуртож №3"
@@ -54,7 +55,7 @@ import { Cabinet, getDisciplines, getData, getScores, getSesId, Scores } from '.
 
 // console.log(cb.data);
 // console.log(cb.disciplines);
-// const { sesID, sessGUID } = await getSesId('LOGIN', 'PASSWORD');
+// const { sesID, sessGUID } = await getSesId(process.env.LOGIN!, process.env.PASSWORD!);
 // console.log(sesID, sessGUID);
 // const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
 // const sessGUID = '20225423078dcb37d97904b76ba534af';
@@ -66,39 +67,40 @@ import { Cabinet, getDisciplines, getData, getScores, getSesId, Scores } from '.
 // // console.log(data2);
 // const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
 
-const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
-const sessGUID = '20225423078dcb37d97904b76ba534af';
-const cb = new Cabinet('LOGIN', 'PASSWORD');
+const sesID = '894CF1B8-9FD8-4D44-A83B-FAC11182EA9C';
+const sessGUID = '558ba94ab569d8701b380dbcfcbc3a42';
+const cb = new Cabinet(process.env.LOGIN!, process.env.PASSWORD!);
 // await cb.auth();
-
-await cb.setSession(sesID, sessGUID);
 // console.log(cb.sesID, cb.sessGUID);
-console.log(await cb.loadData());
+console.log(await cb.setSession(sesID, sessGUID));
+// console.log(cb.sesID, cb.sessGUID);
+// console.log(await cb.loadData());
+console.log(await cb.getId());
 // console.log(cb.allScores);
-printFinalScores(cb.allScores!, cb.disciplines);
+// printFinalScores(cb.allScores!, cb.disciplines);
 
-function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
-    // Створюємо мапу prId → name для швидкого доступу
-    const disciplineMap: Record<string, string> = {};
-    for (const d of disciplines) {
-        disciplineMap[d.prId] = d.name;
-    }
+// function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
+//     // Створюємо мапу prId → name для швидкого доступу
+//     const disciplineMap: Record<string, string> = {};
+//     for (const d of disciplines) {
+//         disciplineMap[d.prId] = d.name;
+//     }
 
-    const result: Record<string, Record<string, string>> = {};
+//     const result: Record<string, Record<string, string>> = {};
 
-    for (const scoresObj of scoresArray) {
-        const disciplineId = scoresObj.prId;
-        const disciplineName = disciplineMap[disciplineId] ?? disciplineId;
-        for (const student of scoresObj.studentScores) {
-            if (!result[student.id]) result[student.id] = {};
-            result[student.id][disciplineName] = student.finalScore;
-        }
-    }
+//     for (const scoresObj of scoresArray) {
+//         const disciplineId = scoresObj.prId;
+//         const disciplineName = disciplineMap[disciplineId] ?? disciplineId;
+//         for (const student of scoresObj.studentScores) {
+//             if (!result[student.id]) result[student.id] = {};
+//             result[student.id][disciplineName] = student.finalScore;
+//         }
+//     }
 
-    for (const studentId in result) {
-        console.log(`Student ${studentId}:`);
-        for (const disciplineName in result[studentId]) {
-            console.log(`  ${disciplineName}: ${result[studentId][disciplineName]}`);
-        }
-    }
-}
+//     for (const studentId in result) {
+//         console.log(`Student ${studentId}:`);
+//         for (const disciplineName in result[studentId]) {
+//             console.log(`  ${disciplineName}: ${result[studentId][disciplineName]}`);
+//         }
+//     }
+// }

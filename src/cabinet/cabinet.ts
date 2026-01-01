@@ -51,6 +51,11 @@ export class Cabinet {
     public allScores?: Scores[];
 
     /**
+     * Айді в системі оцінювання
+     */
+    private id?: string;
+
+    /**
      * Конструктор
      * @param login - Прізвище користувача
      * @param password - Пароль
@@ -171,6 +176,29 @@ export class Cabinet {
             return allScores;
         } catch {
             return [];
+        }
+    }
+
+    /**
+     * Отримати айді в системі оцінювання
+     */
+    public async getId(): Promise<string | undefined> {
+        if (this.id) return this.id;
+        if (!this.sesID || !this.sessGUID) return undefined;
+        if (!this.disciplines?.length) {
+            await this.getDisciplines();
+        }
+        if (!this.disciplines?.length) return undefined;
+        try {
+            const result = await getScores(
+                this.sesID,
+                this.sessGUID!,
+                this.disciplines[0].prId,
+                this.semester,
+            );
+            return result.studentId;
+        } catch {
+            return undefined;
         }
     }
 }
