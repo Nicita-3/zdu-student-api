@@ -1,12 +1,12 @@
 import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { Disciplines } from './types.js';
-import { parseDisciplinesPageN6, parseDisciplinesPageN7 } from './parsers.js';
-import { generateCookieString, isLoginPage } from './utils.js';
+import { parseDisciplinesPageN6, parseDisciplinesPageN7 } from '../cabinet/parsers.js';
+import { generateCookieString, isLoginPage } from '../cabinet/session.js';
 
 /**
  * Отримати всі дисципліни студента
- * @category Cabinet
+ * @category CabinetStudent
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
@@ -66,7 +66,7 @@ function extractStrongValue(html: string, label: string): string | undefined {
 
 /**
  * Отримати поточні дисципліни студента
- * @category Cabinet
+ * @category CabinetStudent
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
@@ -86,7 +86,6 @@ export async function getСurrentDisciplines(sesId: string, sessGUID: string): P
 
         if (isLoginPage(html1)) return result;
         result.disciplines = parseDisciplinesPageN7(html1);
-        //console.log(html1);
         result.ok = true;
         return result;
     } catch (e) {

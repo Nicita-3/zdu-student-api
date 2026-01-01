@@ -1,15 +1,15 @@
-import { getSesId } from './sesId.js';
-import { isValidSession } from './validSession.js';
+import { getSesId, isValidSession } from '../cabinet/session.js';
 import { getСurrentDisciplines } from './disciplines.js';
-import { Discipline, Disciplines, Data, Scores } from './types.js';
-import { getData } from './data.js';
+import { Discipline, Disciplines, DataStudent, Scores } from './types.js';
 import { getScores } from './scores.js';
+import { getSemester } from '../cabinet/utils.js';
+import { getDataStudent } from '../cabinet/data.js';
 
 /**
  * Клас кабінету студента
- * @category Cabinet
+ * @category CabinetStudent
  */
-export class Cabinet {
+export class CabinetStudent {
     /**
      * Прізвище користувача
      */
@@ -31,9 +31,9 @@ export class Cabinet {
     public sessGUID?: string;
 
     /**
-     * Семестр для пошуку оцінок (0 - перший, 1 - другий)
+     * Семестр для пошуку оцінок 1 - перший, 2 - другий)
      */
-    public semester: 0 | 1 = 0;
+    public semester: 1 | 2 = 1;
 
     /**
      * Список дисциплін {@link Discipline}
@@ -43,7 +43,7 @@ export class Cabinet {
     /**
      * Данні студента {@link Data}
      */
-    public data?: Data;
+    public data?: DataStudent;
 
     /**
      * Оціки з усіх предметів {@link Scores}
@@ -69,7 +69,11 @@ export class Cabinet {
      * Авторизація
      */
     public async auth(login?: string, password?: string): Promise<boolean> {
-        const accountData = await getSesId(login ?? this.login, password ?? this.password);
+        const accountData = await getSesId(
+            login ?? this.login,
+            password ?? this.password,
+            'student',
+        );
         this.setSemester();
         if (accountData.ok) {
             this.sesID = accountData.sesID;
@@ -83,13 +87,7 @@ export class Cabinet {
      * Базове значення семестру
      */
     private setSemester() {
-        const year = new Date().getFullYear();
-        const febStart = new Date(year, 1, 1); // лютий = 1
-        const sepStart = new Date(year, 8, 1); // вересень = 8
-        const date = new Date();
-        if (!(date < febStart || date >= sepStart)) {
-            this.semester = 1;
-        }
+        this.semester = getSemester();
     }
 
     /**
@@ -107,7 +105,7 @@ export class Cabinet {
      */
     public async setSession(sesID: string, sessGUID: string): Promise<boolean> {
         this.setSemester();
-        const ses = await isValidSession(sesID, sessGUID);
+        const ses = await isValidSession(sesID, sessGUID, 'student');
         if (ses) {
             this.sesID = sesID;
             this.sessGUID = sessGUID;
@@ -120,12 +118,12 @@ export class Cabinet {
      */
     public async isValidSession(): Promise<boolean> {
         if (!this.sesID || !this.sessGUID) return false;
-        return await isValidSession(this.sesID, this.sessGUID);
+        return await isValidSession(this.sesID, this.sessGUID, 'student');
     }
 
     /**
      * Отримати дисципліни поточного семестру студента
-     * @returns Масив дисциплін {@link Disciplines}
+     * @returns Об'єкт дисциплін {@link Disciplines}
      */
     public async getDisciplines(): Promise<Disciplines> {
         if (!this.sesID || !this.sessGUID) return { ok: false, disciplines: [] };
@@ -142,12 +140,12 @@ export class Cabinet {
 
     /**
      * Отримати анкетні данні студента
-     * @returns Об'єкт {@link ata}
+     * @returns Об'єкт {@link Data}
      */
-    public async getData(): Promise<Data> {
+    public async getData(): Promise<DataStudent> {
         if (!this.sesID || !this.sessGUID) return { ok: false };
         try {
-            const data = await getData(this.sesID, this.sessGUID);
+            const data = await getDataStudent(this.sesID, this.sessGUID);
             if (data.ok) {
                 this.data = data;
             }
@@ -160,7 +158,7 @@ export class Cabinet {
     /**
      * Отримати оцінки з всіх предметів
      */
-    public async getAllScores(semester?: 0 | 1): Promise<Scores[]> {
+    public async getAllScores(semester?: 1 | 2): Promise<Scores[]> {
         if (!this.sesID || !this.sessGUID) return [];
         if (!this.disciplines?.length) return [];
 

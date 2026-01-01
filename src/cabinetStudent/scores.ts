@@ -1,11 +1,11 @@
 import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { Disciplines, ScheduleItem, Scores, StudentScores } from './types.js';
-import { generateCookieString, isLoginPage } from './utils.js';
+import { generateCookieString, isLoginPage } from '../cabinet/session.js';
 
 /**
  * Отримати оцінки пвибраного предмета студента
- * @category Cabinet
+ * @category CabinetStudent
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @param prId - ID дисципліни
@@ -17,7 +17,7 @@ export async function getScores(
     sesId: string,
     sessGUID: string,
     prId: string,
-    semester: 0 | 1,
+    semester: 1 | 2,
 ): Promise<Scores> {
     try {
         const result: Scores = {
@@ -28,7 +28,7 @@ export async function getScores(
             studentScores: [],
         };
         const cookieString = generateCookieString(sessGUID);
-        const formData = `n=7&sesID=${sesId}&teacher=0&irc=0&tid=0&CYKLE=-1&prt=${prId}&hlf=${semester}&grade=0&m=-1`;
+        const formData = `n=7&sesID=${sesId}&teacher=0&irc=0&tid=0&CYKLE=-1&prt=${prId}&hlf=${semester === 1 ? 0 : 1}&grade=0&m=-1`;
         const encodedFormData = iconv.encode(formData, 'windows-1251');
         const response1 = await fetch(
             `https://dekanat.zu.edu.ua/cgi-bin/classman.cgi?n=7&sesID=${sesId}`,

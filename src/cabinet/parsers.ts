@@ -1,10 +1,11 @@
-import { Discipline, Data } from './types.js';
+import { Discipline, DataStudent } from '../cabinetStudent/types.js';
+import { DataTeacher, AcademicGroup } from '../cabinetTeacher/types.js';
 
 /**
  * Парсить дані з сторінки n=31 (анкетні дані)
  */
-export function parseDataPageN31(html: string): Partial<Data> {
-    const data: Partial<Data> = {};
+export function parseDataPageN31(html: string): Partial<DataStudent> {
+    const data: Partial<DataStudent> = {};
     const fullName = extractFullName(html);
     if (fullName) {
         data.fullName = fullName;
@@ -35,8 +36,8 @@ export function parseDataPageN31(html: string): Partial<Data> {
 /**
  * Парсить дані з сторінки n=3 (загальна інформація)
  */
-export function parseDataPageN3(html: string): Partial<Data> {
-    const data: Partial<Data> = {};
+export function parseDataPageN3(html: string): Partial<DataStudent> {
+    const data: Partial<DataStudent> = {};
     const extractFromParagraph = (label: string): string | undefined => {
         const labelIdx = html.indexOf(label);
         if (labelIdx === -1) return undefined;
@@ -181,4 +182,146 @@ export function parseDisciplinesPageN7(html: string): Discipline[] {
     }
 
     return disciplines;
+}
+
+/**
+ * Парсить головну сторінку кабінету викладача
+ * @param html - HTML сторінки кабінету викладача
+ * @returns Дані викладача
+ */
+export function parseTeacherData(html: string): DataTeacher {
+    const data: DataTeacher = { ok: false };
+
+    try {
+        const fullName = extractTeacherFullName(html);
+        if (fullName) {
+            data.fullName = fullName;
+            const nameParts = parseFullName(fullName);
+            Object.assign(data, nameParts);
+        }
+        data.department = extractDepartment(html);
+        data.partTimeHours = extractHoursValue(
+            html,
+            /за сумісництвом\s*:\s*<strong>[^0-9]*\((\d+)[^)]*\)<\/strong>/,
+        );
+        data.workDurationMonths = extractNumericValue(
+            html,
+            /Тривалість роботи в навч\. році \(місяців\):\s*<strong>(\d+)<\/strong>/,
+        );
+        data.totalPositionHours = extractHoursValue(
+            html,
+            /загалом\s*<strong>(\d+)\s*год\.<\/strong>\s*за ставками/,
+        );
+        data.workloadByStaff = extractHoursValue(
+            html,
+            /за штатом\s*-\s*<strong>(\d+)\s*год\.<\/strong>/,
+        );
+        const workloadSectionIndex = html.indexOf('Розподілене навчальне навантаження:');
+        if (workloadSectionIndex !== -1) {
+            const workloadSection = html.substring(workloadSectionIndex);
+            data.totalWorkload = extractHoursValue(
+                workloadSection,
+                /загалом\s*<strong>(\d+)\s*год\.<\/strong>/,
+            );
+        }
+
+        data.ok = true;
+    } catch (error) {
+        data.ok = false;
+    }
+
+    return data;
+}
+
+/**
+ * Витягує повне ім'я викладача з h2 тегу
+ */
+function extractTeacherFullName(html: string): string | undefined {
+    const h2Match = html.match(/<h2>Викладач:\s*([^<]+)<\/h2>/);
+    if (!h2Match) return undefined;
+    return h2Match[1].trim();
+}
+
+/**
+ * Витягує назву кафедри з h3 тегу
+ */
+function extractDepartment(html: string): string | undefined {
+    const h3Match = html.match(/<h3>Кафедра:\s*([^<]+)<\/h3>/);
+    if (!h3Match) return undefined;
+    return h3Match[1].trim();
+}
+
+/**
+ * Витягує числове значення годин за регулярним виразом
+ */
+function extractHoursValue(html: string, regex: RegExp): number | undefined {
+    const match = html.match(regex);
+    if (!match) return undefined;
+    const value = parseInt(match[1], 10);
+    return isNaN(value) ? undefined : value;
+}
+
+/**
+ * Витягує числове значення за регулярним виразом
+ */
+function extractNumericValue(html: string, regex: RegExp): number | undefined {
+    const match = html.match(regex);
+    if (!match) return undefined;
+    const value = parseInt(match[1], 10);
+    return isNaN(value) ? undefined : value;
+}
+
+/**
+ * Парсить сторінку зі списком академічних груп викладача
+ * @param html - HTML сторінки "Академічні групи"
+ * @returns Список груп викладача
+ */
+export function parseGroupsPage(html: string, semester: number): AcademicGroup[] {
+    try {
+        const groups: AcademicGroup[] = [];
+        const rowRegex =
+            /<tr><td><a[^>]+href="\.\/teachers\.cgi\?sesID=[^"]+&n=1&grp=([^"&]+)&teacher=(\d+)"[^>]*>([^<]+)<\/a><\/td><td[^>]*>(\d+)<\/td><td>([^<]+?)<br\s*\/>\s*<em>([^<]+)<\/em><\/td><\/tr>/gi;
+
+        let match: RegExpExecArray | null;
+
+        while ((match = rowRegex.exec(html)) !== null) {
+            const encodedName = match[1].trim();
+            const teacherId = match[2].trim();
+            const name = match[3].trim();
+            const course = parseInt(match[4].trim(), 10);
+            const specialty = match[5].trim();
+            const faculty = match[6].trim();
+
+            // Формуємо повний URL журналу
+            const journalUrl = `./teachers.cgi?sesID={sesID}&n=1&grp=${encodedName}&teacher=${teacherId}`;
+
+            groups.push({
+                name,
+                semester,
+                encodedName,
+                course,
+                specialty,
+                faculty,
+                teacherId,
+                journalUrl,
+            });
+        }
+
+        return groups;
+    } catch {
+        return [];
+    }
+}
+
+/**
+ * Декодує назву групи з URL-encoded формату
+ * @param encodedName - URL-encoded назва групи
+ * @returns Декодована назва групи
+ */
+export function decodeGroupName(encodedName: string): string {
+    try {
+        return decodeURIComponent(encodedName);
+    } catch (error) {
+        return encodedName;
+    }
 }

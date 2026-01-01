@@ -5,8 +5,9 @@ import { getTeachers } from './utility/teachers.js';
 import { Audience } from './audience.js';
 import { getTypesAudience } from './utility/types-audience.js';
 import { getDops } from './utility/dops.js';
-import { Cabinet, getDisciplines, getData, getScores, getSesId, Scores } from './index.js';
+import { getDisciplines, getScores, getSesId, Scores } from './index.js';
 import 'dotenv/config';
+import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -67,17 +68,17 @@ import 'dotenv/config';
 // // console.log(data2);
 // const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
 
-const sesID = '894CF1B8-9FD8-4D44-A83B-FAC11182EA9C';
-const sessGUID = '558ba94ab569d8701b380dbcfcbc3a42';
-const cb = new Cabinet(process.env.LOGIN!, process.env.PASSWORD!);
-// await cb.auth();
-// console.log(cb.sesID, cb.sessGUID);
-console.log(await cb.setSession(sesID, sessGUID));
-// console.log(cb.sesID, cb.sessGUID);
-// console.log(await cb.loadData());
-console.log(await cb.getId());
-// console.log(cb.allScores);
-// printFinalScores(cb.allScores!, cb.disciplines);
+// const sesID = '894CF1B8-9FD8-4D44-A83B-FAC11182EA9C';
+// const sessGUID = '558ba94ab569d8701b380dbcfcbc3a42';
+// const cb = new Cabinet(process.env.LOGIN!, process.env.PASSWORD!);
+// // await cb.auth();
+// // console.log(cb.sesID, cb.sessGUID);
+// console.log(await cb.setSession(sesID, sessGUID));
+// // console.log(cb.sesID, cb.sessGUID);
+// // console.log(await cb.loadData());
+// console.log(await cb.getId());
+// // console.log(cb.allScores);
+// // printFinalScores(cb.allScores!, cb.disciplines);
 
 // function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
 //     // Створюємо мапу prId → name для швидкого доступу
@@ -104,3 +105,14 @@ console.log(await cb.getId());
 //         }
 //     }
 // }
+
+const sesID = '6AAB1510-0D9F-45FD-9F24-3A7B4568BAA7';
+const sessGUID = 'fd09702e51cde3d1bb6bfccdf9fc9e37';
+const cb = new CabinetTeacher(process.env.LOGINT!, process.env.PASSWORDT!);
+// console.log(await cb.auth());
+//console.log(cb.sesID, cb.sessGUID);
+console.log(await cb.setSession(sesID, sessGUID));
+console.log(cb.sesID, cb.sessGUID);
+console.log(await cb.loadData());
+console.log(cb.data);
+console.log(cb.academicGroups);

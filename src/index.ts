@@ -8,3 +8,5 @@ export * from './audience.js';
 export * from './utility/types-audience.js';
 export * from './utility/dops.js';
 export * from './cabinet/index.js';
+export * from './cabinetStudent/index.js';
+export * from './cabinetTeacher/index.js';
