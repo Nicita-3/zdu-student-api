@@ -1,16 +1,62 @@
 import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
-import { parseDataPageN3, parseDataPageN31 } from './parsers.js';
-import { generateCookieString, isLoginPage } from './utils.js';
+import { generateCookieString, isLoginPage } from './session.js';
+import { parseDataPageN3, parseDataPageN31, parseTeacherData } from './parsers.js';
 /**
  * Отримати анкетні дані студента
- * @category Cabinet
+ * @category CabinetTeacher
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
  * @example
  * ```typescript
- * const data = await getData(sesId, sessGUID);
+ * const cb = new CabinetTeacher(process.env.LOGINTEACHER!, process.env.PASSWORDTEACHER!);
+ * const data = await cb.getData(sesId, sessGUID);
+ * // {
+ *       ok: true,
+ *       fullName: 'Іванов Іван Іванович',
+ *       lastName: 'Іванов',
+ *       firstName: 'Іван',
+ *       middleName: 'Іванович',
+ *       department: 'Кафедра комп’ютерних наук та інформаційних технологій',
+ *       partTimeHours: 0,
+ *       workDurationMonths: 10,
+ *       totalPositionHours: 0,
+ *       workloadByStaff: 68,
+ *       totalWorkload: 68
+ * // }
+ * ```
+ * @returns Об'єкт з запарсеними даними {@link DataTeacher}
+ */
+export async function getDataTeacher(sesId, sessGUID) {
+    try {
+        const result = { ok: false };
+        const cookieString = generateCookieString(sessGUID);
+        const response1 = await fetch(`https://dekanat.zu.edu.ua/cgi-bin/kaf.cgi?n=2&sesID=${sesId}`, { headers: { Cookie: cookieString } });
+        const buffer = await response1.arrayBuffer();
+        const html = iconv.decode(Buffer.from(buffer), 'windows-1251');
+        if (isLoginPage(html))
+            return { ok: false };
+        const data = parseTeacherData(html);
+        Object.assign(result, data);
+        result.ok = true;
+        return result;
+    }
+    catch (e) {
+        console.error('Error in getDataTeacher:', e);
+        throw e;
+    }
+}
+/**
+ * Отримати анкетні дані студента
+ * @category CabinetStudent
+ * @param sesId - ID сесії користувача
+ * @param sessGUID - GUID сесії з cookie
+ * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
+ * @example
+ * ```typescript
+ * const cb = new CabinetTeacher(process.env.LOGINSTUDENT!, process.env.PASSWORDSTUDENT!);
+ * const data = await cb.getData(sesId, sessGUID);
  * // {
  * //   ok: true,
  * //   fullName: 'Іванов Іван Іванович',
@@ -37,7 +83,7 @@ import { generateCookieString, isLoginPage } from './utils.js';
  * ```
  * @returns Об'єкт з запарсеними даними {@link Data}
  */
-export async function getData(sesId, sessGUID) {
+export async function getDataStudent(sesId, sessGUID) {
     try {
         const result = { ok: false };
         const cookieString = generateCookieString(sessGUID);
@@ -63,7 +109,7 @@ export async function getData(sesId, sessGUID) {
         return result;
     }
     catch (e) {
-        console.error('Error in getData:', e);
+        console.error('Error in getDataStudent:', e);
         throw e;
     }
 }

@@ -1,37 +1,37 @@
 {
-  "name": "zdu-student-api",
-  "version": "1.1.6",
-  "description": "API client for ZDU student services",
-  "author": "Nicita3 <ni596157@gmail.com> (https://github.com/Nicita-3)",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "type": "module",
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "tsc",
-    "docs": "typedoc --out docs src",
-    "test": "node --loader ts-node/esm src/examples.ts",
-    "publish:all": "npm run build && npm run docs && npm publish"
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Nicita-3/zdu-student-api"
-  },
-  "homepage": "https://nicita-3.github.io/zdu-student-api",
-  "devDependencies": {
-    "@types/node": "^24.10.1",
-    "prettier": "^3.7.4",
-    "ts-node": "^10.9.2",
-    "typedoc": "^0.28.14",
-    "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "buffer": "^6.0.3",
-    "cross-fetch": "^4.1.0",
-    "dotenv": "^17.2.3",
-    "iconv-lite": "^0.7.0"
-  }
+    "name": "zdu-student-api",
+    "version": "1.1.7",
+    "description": "API client for ZDU student services",
+    "author": "Nicita3 <ni596157@gmail.com> (https://github.com/Nicita-3)",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "files": [
+        "dist"
+    ],
+    "scripts": {
+        "build": "tsc",
+        "docs": "typedoc --out docs src",
+        "test": "node --loader ts-node/esm src/examples.ts",
+        "publish:all": "npm run build && npm run docs && npm publish"
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Nicita-3/zdu-student-api"
+    },
+    "homepage": "https://nicita-3.github.io/zdu-student-api",
+    "devDependencies": {
+        "@types/node": "^24.10.1",
+        "prettier": "^3.7.4",
+        "ts-node": "^10.9.2",
+        "typedoc": "^0.28.14",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "buffer": "^6.0.3",
+        "cross-fetch": "^4.1.0",
+        "dotenv": "^17.2.3",
+        "iconv-lite": "^0.7.0"
+    }
 }

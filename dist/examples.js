@@ -1,4 +1,5 @@
-import { Cabinet } from './index.js';
+import 'dotenv/config';
+import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
 // schedule.type = 'group'
@@ -23,9 +24,9 @@ import { Cabinet } from './index.js';
 // } catch (err: any) {
 //     console.error(err.message);
 // }
-//console.log((await getGroups('25Бд-Комп'))) // -3158
-// console.log((await getTeachers('Кривонос Олександр')))
-// console.log((await getRooms('319')))
+// console.log(await getGroups('25Бд-Комп')); // -3158
+// console.log(await getTeachers('Кривонос Олександр'));
+// console.log(await getRooms('319'));
 // const audience = new Audience();
 // audience.blockName = "гуртож №3"
 // try {
@@ -39,7 +40,7 @@ import { Cabinet } from './index.js';
 // console.log((await getSesId("FFFFF", "123456789")))
 // console.log(cb.data);
 // console.log(cb.disciplines);
-// const { sesID, sessGUID } = await getSesId('LOGIN', 'PASSWORD');
+// const { sesID, sessGUID } = await getSesId(process.env.LOGIN!, process.env.PASSWORD!);
 // console.log(sesID, sessGUID);
 // const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
 // const sessGUID = '20225423078dcb37d97904b76ba534af';
@@ -50,35 +51,46 @@ import { Cabinet } from './index.js';
 // const data2 = await getScores(sesID, sessGUID, '43910', 0);
 // // console.log(data2);
 // const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
-const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
-const sessGUID = '20225423078dcb37d97904b76ba534af';
-const cb = new Cabinet('LOGIN', 'PASSWORD');
-// await cb.auth();
-await cb.setSession(sesID, sessGUID);
-// console.log(cb.sesID, cb.sessGUID);
+// const sesID = '894CF1B8-9FD8-4D44-A83B-FAC11182EA9C';
+// const sessGUID = '558ba94ab569d8701b380dbcfcbc3a42';
+// const cb = new Cabinet(process.env.LOGIN!, process.env.PASSWORD!);
+// // await cb.auth();
+// // console.log(cb.sesID, cb.sessGUID);
+// console.log(await cb.setSession(sesID, sessGUID));
+// // console.log(cb.sesID, cb.sessGUID);
+// // console.log(await cb.loadData());
+// console.log(await cb.getId());
+// // console.log(cb.allScores);
+// // printFinalScores(cb.allScores!, cb.disciplines);
+// function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
+//     // Створюємо мапу prId → name для швидкого доступу
+//     const disciplineMap: Record<string, string> = {};
+//     for (const d of disciplines) {
+//         disciplineMap[d.prId] = d.name;
+//     }
+//     const result: Record<string, Record<string, string>> = {};
+//     for (const scoresObj of scoresArray) {
+//         const disciplineId = scoresObj.prId;
+//         const disciplineName = disciplineMap[disciplineId] ?? disciplineId;
+//         for (const student of scoresObj.studentScores) {
+//             if (!result[student.id]) result[student.id] = {};
+//             result[student.id][disciplineName] = student.finalScore;
+//         }
+//     }
+//     for (const studentId in result) {
+//         console.log(`Student ${studentId}:`);
+//         for (const disciplineName in result[studentId]) {
+//             console.log(`  ${disciplineName}: ${result[studentId][disciplineName]}`);
+//         }
+//     }
+// }
+const sesID = '6AAB1510-0D9F-45FD-9F24-3A7B4568BAA7';
+const sessGUID = 'fd09702e51cde3d1bb6bfccdf9fc9e37';
+const cb = new CabinetTeacher(process.env.LOGINT, process.env.PASSWORDT);
+// console.log(await cb.auth());
+//console.log(cb.sesID, cb.sessGUID);
+console.log(await cb.setSession(sesID, sessGUID));
+console.log(cb.sesID, cb.sessGUID);
 console.log(await cb.loadData());
-// console.log(cb.allScores);
-printFinalScores(cb.allScores, cb.disciplines);
-function printFinalScores(scoresArray, disciplines) {
-    // Створюємо мапу prId → name для швидкого доступу
-    const disciplineMap = {};
-    for (const d of disciplines) {
-        disciplineMap[d.prId] = d.name;
-    }
-    const result = {};
-    for (const scoresObj of scoresArray) {
-        const disciplineId = scoresObj.prId;
-        const disciplineName = disciplineMap[disciplineId] ?? disciplineId;
-        for (const student of scoresObj.studentScores) {
-            if (!result[student.id])
-                result[student.id] = {};
-            result[student.id][disciplineName] = student.finalScore;
-        }
-    }
-    for (const studentId in result) {
-        console.log(`Student ${studentId}:`);
-        for (const disciplineName in result[studentId]) {
-            console.log(`  ${disciplineName}: ${result[studentId][disciplineName]}`);
-        }
-    }
-}
+console.log(cb.data);
+console.log(cb.academicGroups);

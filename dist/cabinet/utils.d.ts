@@ -1,8 +1,9 @@
 /**
- * Перевіряє чи є це сторінка авторизації
+ * Отримати ймовірний семестр поточної дати
+ * @category Cabinet
+ * @remarks
+ * - `ok` — Успіх отримання токену
+ * - `sesID` — ID сесії користувача
+ * - `sessGUID` — GUID сесії з cookie
  */
-export declare function isLoginPage(html: string): boolean;
-/**
- * Генерує cookie строку з DateTime та SessGUID
- */
-export declare function generateCookieString(sessGUID: string): string;
+export declare function getSemester(): 1 | 2;
