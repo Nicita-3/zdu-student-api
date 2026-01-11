@@ -1,6 +1,6 @@
 import { Scores } from './types.js';
 /**
- * Отримати оцінки пвибраного предмета студента
+ * Отримати оцінки вибраного предмета студента
  * @category CabinetStudent
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie

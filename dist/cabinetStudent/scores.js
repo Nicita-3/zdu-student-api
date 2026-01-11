@@ -2,7 +2,7 @@ import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
 /**
- * Отримати оцінки пвибраного предмета студента
+ * Отримати оцінки вибраного предмета студента
  * @category CabinetStudent
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
@@ -35,13 +35,15 @@ export async function getScores(sesId, sessGUID, prId, semester) {
             return result;
         result.scheduleItem = parseSchedule(html1);
         result.studentScores = parseScores(html1);
-        result.studentId = result.studentScores[0].id;
-        result.studentScores.sort((a, b) => a.id.localeCompare(b.id));
+        result.studentId = result.studentScores[0]?.id;
+        if (result.studentScores.length > 1) {
+            result.studentScores.sort((a, b) => a.id.localeCompare(b.id));
+        }
         result.ok = true;
         return result;
     }
     catch (e) {
-        console.error('Error in getQuestionnaireData:', e);
+        console.error('Error in getScores:', e);
         throw e;
     }
 }
