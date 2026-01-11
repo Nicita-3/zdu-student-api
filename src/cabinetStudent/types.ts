@@ -140,7 +140,7 @@ export interface StudentScores {
 export interface Scores {
     ok: boolean;
     prId: string;
-    studentId: string;
+    studentId?: string;
     scheduleItem: ScheduleItem[];
     studentScores: StudentScores[];
 }

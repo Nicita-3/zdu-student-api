@@ -1,4 +1,10 @@
-import { Discipline, getСurrentDisciplines, Schedule, scheduleErrors } from './index.js';
+import {
+    CabinetStudent,
+    Discipline,
+    getСurrentDisciplines,
+    Schedule,
+    scheduleErrors,
+} from './index.js';
 import { getGroups } from './utility/groups.js';
 import { getRooms } from './utility/rooms.js';
 import { getTeachers } from './utility/teachers.js';
@@ -58,8 +64,8 @@ import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 // console.log(cb.disciplines);
 // const { sesID, sessGUID } = await getSesId(process.env.LOGIN!, process.env.PASSWORD!);
 // console.log(sesID, sessGUID);
-// const sesID = '2850142C-AF52-4291-90C6-7EF356F90530';
-// const sessGUID = '20225423078dcb37d97904b76ba534af';
+// const sesID = '';
+// const sessGUID = '';
 // const data = await getData(sesID, sessGUID);
 // const data = await getDisciplines(sesID, sessGUID);
 // const data = await getСurrentDisciplines(sesID, sessGUID);
@@ -68,18 +74,19 @@ import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 // // console.log(data2);
 // const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
 
-// const sesID = '894CF1B8-9FD8-4D44-A83B-FAC11182EA9C';
-// const sessGUID = '558ba94ab569d8701b380dbcfcbc3a42';
-// const cb = new Cabinet(process.env.LOGIN!, process.env.PASSWORD!);
-// // await cb.auth();
+// const sesID = '';
+// const sessGUID = '';
+// //const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
+// //await cb.auth();
 // // console.log(cb.sesID, cb.sessGUID);
 // console.log(await cb.setSession(sesID, sessGUID));
 // // console.log(cb.sesID, cb.sessGUID);
-// // console.log(await cb.loadData());
+// console.log(await cb.loadData());
+// await cb.getDisciplines();
 // console.log(await cb.getId());
-// // console.log(cb.allScores);
-// // printFinalScores(cb.allScores!, cb.disciplines);
 
+// console.log(cb.allScores);
+// printFinalScores(cb.allScores!, cb.disciplines);
 // function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
 //     // Створюємо мапу prId → name для швидкого доступу
 //     const disciplineMap: Record<string, string> = {};
@@ -106,13 +113,13 @@ import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 //     }
 // }
 
-const sesID = '6AAB1510-0D9F-45FD-9F24-3A7B4568BAA7';
-const sessGUID = 'fd09702e51cde3d1bb6bfccdf9fc9e37';
-const cb = new CabinetTeacher(process.env.LOGINT!, process.env.PASSWORDT!);
-// console.log(await cb.auth());
-//console.log(cb.sesID, cb.sessGUID);
-console.log(await cb.setSession(sesID, sessGUID));
-console.log(cb.sesID, cb.sessGUID);
-console.log(await cb.loadData());
-console.log(cb.data);
-console.log(cb.academicGroups);
+// const sesID = '';
+// const sessGUID = '';
+// const cb = new CabinetTeacher(process.env.LOGINT!, process.env.PASSWORDT!);
+// // console.log(await cb.auth());
+// //console.log(cb.sesID, cb.sessGUID);
+// console.log(await cb.setSession(sesID, sessGUID));
+// console.log(cb.sesID, cb.sessGUID);
+// console.log(await cb.loadData());
+// console.log(cb.data);
+// console.log(cb.academicGroups);

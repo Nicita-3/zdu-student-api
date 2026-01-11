@@ -163,13 +163,22 @@ export class CabinetStudent {
         if (!this.disciplines?.length) return [];
 
         const targetSemester = semester ?? this.semester;
+        const allScores: Scores[] = [];
 
         try {
-            const scorePromises = this.disciplines.map((discipline) =>
-                getScores(this.sesID!, this.sessGUID!, discipline.prId, targetSemester),
-            );
-            const results = await Promise.all(scorePromises);
-            const allScores = results.filter((scores) => scores.ok);
+            for (const discipline of this.disciplines) {
+                const scores = await getScores(
+                    this.sesID,
+                    this.sessGUID,
+                    discipline.prId,
+                    targetSemester,
+                );
+
+                if (scores.ok) {
+                    allScores.push(scores);
+                }
+            }
+
             this.allScores = allScores;
             return allScores;
         } catch {
