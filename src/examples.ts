@@ -76,12 +76,14 @@ import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 
 // const sesID = '';
 // const sessGUID = '';
-// //const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
-// //await cb.auth();
+const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
+await cb.auth();
 // // console.log(cb.sesID, cb.sessGUID);
 // console.log(await cb.setSession(sesID, sessGUID));
 // // console.log(cb.sesID, cb.sessGUID);
 // console.log(await cb.loadData());
+console.log(await cb.getData());
+// console.log(cb.data);
 // await cb.getDisciplines();
 // console.log(await cb.getId());
 

@@ -148,11 +148,48 @@ export class CabinetStudent {
             const data = await getDataStudent(this.sesID, this.sessGUID);
             if (data.ok) {
                 this.data = data;
+                await this.getCourse();
             }
             return data;
         } catch {
             return { ok: false };
         }
+    }
+
+    /**
+     * Отримати курс студента
+     * @returns курс (число) або undefined
+     */
+    public async getCourse(): Promise<number | undefined> {
+        if (!this.data) {
+            const data = await this.getData();
+            if (!data.ok || !this.data) return undefined;
+        }
+
+        if (this.data.course) return this.data.course;
+        if (!this.data.enrollmentDate || !this.data.studyDuration) return undefined;
+
+        const [d, m, y] = this.data.enrollmentDate.split('.').map(Number);
+        const enrollmentDate = new Date(y, m - 1, d);
+
+        const now = new Date();
+
+        const academicYear = (date: Date) =>
+            date.getMonth() >= 7 ? date.getFullYear() : date.getFullYear() - 1;
+
+        const enrollmentYear = academicYear(enrollmentDate);
+        const currentYear = academicYear(now);
+
+        let course = currentYear - enrollmentYear + 1;
+
+        const durationYears = parseInt(this.data.studyDuration);
+        if (isNaN(durationYears)) return undefined;
+
+        if (course < 1) course = 1;
+        if (course > durationYears) return durationYears;
+
+        this.data.course = course;
+        return course;
     }
 
     /**
