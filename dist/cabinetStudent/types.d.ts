@@ -25,6 +25,7 @@
  * - `phones` — Масив телефонних номерів студента
  *
  * **Дані про навчання:**
+ * - `course` — Поточний курс
  * - `faculty` — Факультет
  * - `specialty` — Спеціальність (назва освітньої програми)
  * - `degree` — Ступінь / Освітньо-професійний ступінь (бакалавр, магістр тощо)
@@ -51,6 +52,7 @@ export interface DataStudent {
     middleNameEng?: string;
     email?: string;
     phones?: string[];
+    course?: number;
     faculty?: string;
     specialty?: string;
     degree?: string;

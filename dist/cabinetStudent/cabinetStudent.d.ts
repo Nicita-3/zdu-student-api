@@ -77,6 +77,11 @@ export declare class CabinetStudent {
      */
     getData(): Promise<DataStudent>;
     /**
+     * Отримати курс студента
+     * @returns курс (число) або undefined
+     */
+    getCourse(): Promise<number | undefined>;
+    /**
      * Отримати оцінки з всіх предметів
      */
     getAllScores(semester?: 1 | 2): Promise<Scores[]>;

@@ -1,3 +1,4 @@
+import { CabinetStudent, } from './index.js';
 import 'dotenv/config';
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -52,12 +53,14 @@ import 'dotenv/config';
 // const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
 // const sesID = '';
 // const sessGUID = '';
-// //const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
-// //await cb.auth();
+const cb = new CabinetStudent(process.env.LOGIN, process.env.PASSWORD);
+await cb.auth();
 // // console.log(cb.sesID, cb.sessGUID);
 // console.log(await cb.setSession(sesID, sessGUID));
 // // console.log(cb.sesID, cb.sessGUID);
 // console.log(await cb.loadData());
+console.log(await cb.getData());
+// console.log(cb.data);
 // await cb.getDisciplines();
 // console.log(await cb.getId());
 // console.log(cb.allScores);
