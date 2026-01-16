@@ -1,6 +1,6 @@
 {
     "name": "zdu-student-api",
-    "version": "1.1.9",
+    "version": "1.1.10",
     "description": "API client for ZDU student services",
     "author": "Nicita3 <ni596157@gmail.com> (https://github.com/Nicita-3)",
     "main": "dist/index.js",

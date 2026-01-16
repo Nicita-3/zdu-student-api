@@ -97,18 +97,20 @@ export interface Disciplines {
  * Опис заняття у кабінеті студента
  * @category CabinetStudent
  * @remarks
- * - `teacher` — Прізвище та ініціали викладача
- * - `date` — Дата заняття у форматі "dd.mm.yyyy"
- * - `type` — Тип заняття: "Лек", "ПрСем", "Лаб", "МК", "Екз"
+ * - `teacher` — Прізвище та ініціали викладача (undefined для модульних днів)
+ * - `date` — Дата заняття у форматі "dd.mm.yyyy" (undefined для модульних днів)
+ * - `type` — Тип заняття: "Лек", "ПрСем", "Лаб", "МК", "Екз", "МД"
  * - `time` — Час заняття у форматі "HH:MM-HH:MM"
  * - `index` — Значення атрибута `data-ind`, унікальний ідентифікатор
+ * - `description` — Опис заняття (може бути undefined) ("Модуль ##" для модульних днів, де ## - номер модуля, наприклад М0, М1)
  */
 export interface ScheduleItem {
-    teacher: string;
-    date: string;
+    teacher?: string;
+    date?: string;
     type: string;
     time: string;
     index: string;
+    description?: string;
 }
 
 /**
