@@ -67,10 +67,18 @@ export class CabinetStudent {
         return false;
     }
     /**
-     * Базове значення семестру
+     * Встановити семестр
+     * @param password - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
      */
-    setSemester() {
-        this.semester = getSemester();
+    setSemester(semester) {
+        if (!semester)
+            this.semester = getSemester();
+        else {
+            if (semester === '1' || semester === 1)
+                this.semester = 1;
+            if (semester === '2' || semester === 2)
+                this.semester = 2;
+        }
     }
     /**
      * Отримання всіх данних

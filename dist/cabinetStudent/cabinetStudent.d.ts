@@ -51,9 +51,10 @@ export declare class CabinetStudent {
      */
     auth(login?: string, password?: string): Promise<boolean>;
     /**
-     * Базове значення семестру
+     * Встановити семестр
+     * @param password - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
      */
-    private setSemester;
+    setSemester(semester?: 1 | 2 | '1' | '2'): void;
     /**
      * Отримання всіх данних
      */
