@@ -71,6 +71,13 @@ function parseSchedule(html) {
     if (thirdTrStart === -1 || thirdTrEnd === -1)
         return [];
     let thirdRow = theadContent.slice(thirdTrStart, thirdTrEnd);
+    // Збираємо всі data-ind з thead в порядку появи (вони у другому рядку)
+    const allInds = [];
+    const indRegex = /data-ind="([^"]+)"/g;
+    let indMatch;
+    while ((indMatch = indRegex.exec(theadContent)) !== null) {
+        allInds.push(indMatch[1]);
+    }
     const result = [];
     const thStartRegex = /<th\b/g;
     const positions = [];
@@ -85,6 +92,7 @@ function parseSchedule(html) {
         thirdPositions.push(match.index);
     }
     thirdPositions.push(thirdRow.length);
+    let indIdx = 0;
     for (let i = 0; i < positions.length - 1; i++) {
         const start = positions[i];
         const end = positions[i + 1];
@@ -118,10 +126,17 @@ function parseSchedule(html) {
         if (!dataHthMatch)
             continue;
         const dataHth = dataHthMatch[1];
+        let index;
         const aMatch = thContent.match(/data-ind="([^"]+)"/);
-        if (!aMatch)
-            continue;
-        const index = aMatch[1];
+        if (aMatch) {
+            index = aMatch[1];
+        }
+        else {
+            if (indIdx >= allInds.length)
+                continue;
+            index = allInds[indIdx];
+        }
+        indIdx++;
         const dateMatch = thContent.match(/>(\d{2}\.\d{2}\.\d{4})</);
         const date = dateMatch ? dateMatch[1] : '';
         const timeMatch = thContent.match(/<br[^>]*>\s*(\d{2}:\d{2}-\d{2}:\d{2})/);
