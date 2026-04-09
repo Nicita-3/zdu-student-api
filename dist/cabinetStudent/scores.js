@@ -137,7 +137,7 @@ function parseSchedule(html) {
             index = allInds[indIdx];
         }
         indIdx++;
-        const dateMatch = thContent.match(/>(\d{2}\.\d{2}\.\d{4})</);
+        const dateMatch = thContent.match(/(\d{2}\.\d{2}\.\d{4})/);
         const date = dateMatch ? dateMatch[1] : '';
         const timeMatch = thContent.match(/<br[^>]*>\s*(\d{2}:\d{2}-\d{2}:\d{2})/);
         const time = timeMatch ? timeMatch[1].trim() : '';
