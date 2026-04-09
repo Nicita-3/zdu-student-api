@@ -3,6 +3,7 @@ import iconv from 'iconv-lite';
 import { Disciplines } from './types.js';
 import { parseDisciplinesPageN6, parseDisciplinesPageN7 } from '../cabinet/parsers.js';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
+import { Buffer } from 'buffer';
 
 /**
  * Отримати всі дисципліни студента

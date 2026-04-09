@@ -4,6 +4,7 @@ import { DataTeacher } from '../cabinetTeacher/types.js';
 import { generateCookieString, isLoginPage } from './session.js';
 import { parseDataPageN3, parseDataPageN31, parseTeacherData } from './parsers.js';
 import { DataStudent } from '../cabinetStudent/types.js';
+import { Buffer } from 'buffer';
 
 /**
  * Отримати анкетні дані студента

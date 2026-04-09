@@ -1,5 +1,6 @@
 import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
+import { Buffer } from 'buffer';
 /**
  * Отримати sesID та sessGUID користувача
  * @category Cabinet

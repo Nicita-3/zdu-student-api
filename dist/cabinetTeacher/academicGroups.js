@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
 import { parseGroupsPage } from '../cabinet/parsers.js';
+import { Buffer } from 'buffer';
 /**
  * Отримати всі академічні групи
  * @category CabinetTeacher

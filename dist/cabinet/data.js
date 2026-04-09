@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { generateCookieString, isLoginPage } from './session.js';
 import { parseDataPageN3, parseDataPageN31, parseTeacherData } from './parsers.js';
+import { Buffer } from 'buffer';
 /**
  * Отримати анкетні дані студента
  * @category CabinetTeacher

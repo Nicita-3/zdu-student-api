@@ -1,6 +1,7 @@
 import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
+import { Buffer } from 'buffer';
 /**
  * Отримати оцінки вибраного предмета студента
  * @category CabinetStudent

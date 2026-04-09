@@ -173,7 +173,7 @@ export class Schedule {
     private encodeCP1251(str: string) {
         const buf = iconv.encode(str, 'win1251');
         return Array.from(buf)
-            .map((b) => '%' + b.toString(16).toUpperCase().padStart(2, '0'))
+            .map((b: any) => '%' + b.toString(16).toUpperCase().padStart(2, '0'))
             .join('');
     }
 }

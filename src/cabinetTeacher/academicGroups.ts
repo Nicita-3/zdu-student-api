@@ -3,6 +3,7 @@ import iconv from 'iconv-lite';
 import { AcademicGroups } from './types.js';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
 import { parseGroupsPage } from '../cabinet/parsers.js';
+import { Buffer } from 'buffer';
 
 /**
  * Отримати всі академічні групи

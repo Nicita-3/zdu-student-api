@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { parseDisciplinesPageN6, parseDisciplinesPageN7 } from '../cabinet/parsers.js';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
+import { Buffer } from 'buffer';
 /**
  * Отримати всі дисципліни студента
  * @category CabinetStudent

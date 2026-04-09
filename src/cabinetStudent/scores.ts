@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
 import { Disciplines, ScheduleItem, Scores, StudentScores } from './types.js';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
+import { Buffer } from 'buffer';
 
 /**
  * Отримати оцінки вибраного предмета студента

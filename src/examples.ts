@@ -14,7 +14,6 @@ import { getDops } from './utility/dops.js';
 import { getDisciplines, getScores, getSesId, Scores } from './index.js';
 import 'dotenv/config';
 import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
-import { writeFile } from 'fs/promises';
 
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -47,10 +46,17 @@ import { writeFile } from 'fs/promises';
 // console.log(await getRooms('319'));
 
 // const audience = new Audience();
-// audience.blockName = "гуртож №3"
+// // audience.blockName = 'гуртож №3';
 // try {
+//     audience.roomType = 'Комп. клас';
+//     audience.blockName = '№1';
+//     const [day, month, year] = '09.02.2026'.split('.');
+//     audience.roomsDate = new Date(+year, +month - 1, +day + 1);
+//     console.log(audience.roomsDate);
+//     audience.lesson = 5;
 //     const audiences = await audience.getAudience();
-//     console.log("Аудиторії:", audiences);
+
+//     console.log('Аудиторії:', audiences);
 // } catch (err: any) {
 //     console.error(err.message);
 // }

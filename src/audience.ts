@@ -84,6 +84,7 @@ export class Audience {
             dops += `&dop_${dop}=yes`;
         });
 
+        // TODO FIX MIN AND MAX. IF MIN = true & !MAX, MAX=999999999
         const response = await fetch(
             `https://dekanat.zu.edu.ua/cgi-bin/timetable_export.cgi?req_type=free_rooms_list&&block_name=${this.blockName !== undefined ? this.encodeCP1251(this.blockName) : ''}&size_min=${this.size_min !== undefined ? this.size_min : ''}&size_max=${this.size_max !== undefined ? this.size_max : ''}&room_type=${this.roomType !== undefined ? this.encodeCP1251(this.roomType) : ''}&begin_date=${date}&lesson=${this.lesson}${dops}&req_format=json&coding_mode=UTF8&bs=%D1%F4%EE%F0%EC%F3%E2%E0%F2%E8+%E7%E0%EF%E8%F2`,
         );
@@ -98,7 +99,7 @@ export class Audience {
     private encodeCP1251(str: string) {
         const buf = iconv.encode(str, 'win1251');
         return Array.from(buf)
-            .map((b) => '%' + b.toString(16).toUpperCase().padStart(2, '0'))
+            .map((b: any) => '%' + b.toString(16).toUpperCase().padStart(2, '0'))
             .join('');
     }
 }
