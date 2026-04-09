@@ -64,16 +64,13 @@ export async function getScores(
 function parseSchedule(html: string): ScheduleItem[] {
     let idx = html.indexOf('<thead>');
     if (idx === -1) return [];
-
     let theadEnd = html.indexOf('</thead>', idx);
     if (theadEnd === -1) return [];
-
     let theadContent = html.slice(idx, theadEnd);
 
     let firstTrStart = theadContent.indexOf('<tr>');
     let firstTrEnd = theadContent.indexOf('</tr>', firstTrStart);
     if (firstTrStart === -1 || firstTrEnd === -1) return [];
-
     let firstRow = theadContent.slice(firstTrStart, firstTrEnd);
 
     let secondTrStart = theadContent.indexOf('<tr>', firstTrEnd);
@@ -81,15 +78,21 @@ function parseSchedule(html: string): ScheduleItem[] {
     let thirdTrStart = theadContent.indexOf('<tr>', secondTrEnd);
     let thirdTrEnd = theadContent.indexOf('</tr>', thirdTrStart);
     if (thirdTrStart === -1 || thirdTrEnd === -1) return [];
-
     let thirdRow = theadContent.slice(thirdTrStart, thirdTrEnd);
 
-    const result: ScheduleItem[] = [];
+    // Збираємо всі data-ind з thead в порядку появи (вони у другому рядку)
+    const allInds: string[] = [];
+    const indRegex = /data-ind="([^"]+)"/g;
+    let indMatch: RegExpExecArray | null;
+    while ((indMatch = indRegex.exec(theadContent)) !== null) {
+        allInds.push(indMatch[1]);
+    }
 
+    const result: ScheduleItem[] = [];
     const thStartRegex = /<th\b/g;
     const positions: number[] = [];
-
     let match: RegExpExecArray | null;
+
     while ((match = thStartRegex.exec(firstRow)) !== null) {
         positions.push(match.index);
     }
@@ -101,6 +104,8 @@ function parseSchedule(html: string): ScheduleItem[] {
         thirdPositions.push(match.index);
     }
     thirdPositions.push(thirdRow.length);
+
+    let indIdx = 0;
 
     for (let i = 0; i < positions.length - 1; i++) {
         const start = positions[i];
@@ -140,10 +145,16 @@ function parseSchedule(html: string): ScheduleItem[] {
 
         const dataHth = dataHthMatch[1];
 
+        let index: string;
         const aMatch = thContent.match(/data-ind="([^"]+)"/);
-        if (!aMatch) continue;
+        if (aMatch) {
+            index = aMatch[1];
+        } else {
+            if (indIdx >= allInds.length) continue;
+            index = allInds[indIdx];
+        }
+        indIdx++;
 
-        const index = aMatch[1];
         const dateMatch = thContent.match(/>(\d{2}\.\d{2}\.\d{4})</);
         const date = dateMatch ? dateMatch[1] : '';
         const timeMatch = thContent.match(/<br[^>]*>\s*(\d{2}:\d{2}-\d{2}:\d{2})/);
