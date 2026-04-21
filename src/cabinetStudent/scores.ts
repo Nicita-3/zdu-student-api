@@ -186,7 +186,7 @@ function parseSchedule(html: string): ScheduleItem[] {
  */
 function parseDescriptions(html: string): Map<string, string> {
     const descriptions = new Map<string, string>();
-    const divRegex = /<div\s+id="r(\d+)"\s+class="hidden">\s*([\s\S]*?)\s*<br>/g;
+    const divRegex = /<div\s+id="(r\d+)"\s+class="hidden">\s*([\s\S]*?)\s*<br>/g;
     let match: RegExpExecArray | null;
 
     while ((match = divRegex.exec(html)) !== null) {

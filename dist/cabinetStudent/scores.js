@@ -163,7 +163,7 @@ function parseSchedule(html) {
  */
 function parseDescriptions(html) {
     const descriptions = new Map();
-    const divRegex = /<div\s+id="r(\d+)"\s+class="hidden">\s*([\s\S]*?)\s*<br>/g;
+    const divRegex = /<div\s+id="(r\d+)"\s+class="hidden">\s*([\s\S]*?)\s*<br>/g;
     let match;
     while ((match = divRegex.exec(html)) !== null) {
         const index = match[1];

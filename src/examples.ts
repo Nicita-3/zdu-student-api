@@ -14,6 +14,8 @@ import { getDops } from './utility/dops.js';
 import { getDisciplines, getScores, getSesId, Scores } from './index.js';
 import 'dotenv/config';
 import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
+// import process from 'process';
+// import { writeFile } from 'fs/promises';
 
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -91,7 +93,7 @@ import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 // // // console.log(cb.sesID, cb.sessGUID);
 // await cb.loadData();
 // const scores = cb.allScores;
-// await writeFile('scores.json', JSON.stringify(scores, null, 2), 'utf-8');
+// await writeFile('scores.json', JSON.stringify(scores![14], null, 2));
 
 // console.log(cb.data);
 // await cb.getDisciplines();
