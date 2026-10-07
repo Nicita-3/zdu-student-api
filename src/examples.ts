@@ -14,7 +14,7 @@ import { getDops } from './utility/dops.js';
 import { getDisciplines, getScores, getSesId, Scores } from './index.js';
 import 'dotenv/config';
 import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
-// import process from 'process';
+import process from 'node:process';
 // import { writeFile } from 'fs/promises';
 
 // const schedule = new Schedule();
@@ -86,14 +86,16 @@ import { CabinetTeacher } from './cabinetTeacher/cabinetTeacher.js';
 // const sesID = '';
 // const sessGUID = '';
 
-// const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
-// await cb.auth();
-// // // console.log(cb.sesID, cb.sessGUID);
-// // console.log(await cb.setSession(sesID, sessGUID));
-// // // console.log(cb.sesID, cb.sessGUID);
+const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
+await cb.auth();
+console.log(cb.sesID, cb.sessGUID);
+await cb.loadData();
+console.log(cb.data);
+// console.log(await cb.setSession(sesID, sessGUID));
+// // console.log(cb.sesID, cb.sessGUID);
 // await cb.loadData();
 // const scores = cb.allScores;
-// await writeFile('scores.json', JSON.stringify(scores![14], null, 2));
+// await writeFile('scores.json', JSON.stringify(cb.disciplines, null, 2));
 
 // console.log(cb.data);
 // await cb.getDisciplines();

@@ -1,6 +1,24 @@
 import { Discipline, DataStudent } from '../cabinetStudent/types.js';
 import { DataTeacher, AcademicGroup } from '../cabinetTeacher/types.js';
 
+function escapeRegExp(s: string): string {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/** Значення з `<li>Мітка <strong>значення</strong></li>` (n=31) */
+function extractStrongValue(html: string, label: string): string | undefined {
+    const m = html.match(new RegExp(`${escapeRegExp(label)}\\s*<strong>([^<]*)</strong>`));
+    const value = m?.[1].replace(/\s+/g, ' ').trim();
+    return value ? value : undefined;
+}
+
+/** ПІБ з `<h3>Талько Ангеліна Володимирівна </h3>` (n=31) */
+function extractFullName(html: string): string | undefined {
+    const m = html.match(/<h3>([^<]+)<\/h3>/);
+    const value = m?.[1].replace(/\s+/g, ' ').trim();
+    return value ? value : undefined;
+}
+
 /**
  * Парсить дані з сторінки n=31 (анкетні дані)
  */
@@ -38,87 +56,61 @@ export function parseDataPageN31(html: string): Partial<DataStudent> {
  */
 export function parseDataPageN3(html: string): Partial<DataStudent> {
     const data: Partial<DataStudent> = {};
-    const extractFromParagraph = (label: string): string | undefined => {
+
+    const getParagraph = (label: string): string | undefined => {
         const labelIdx = html.indexOf(label);
         if (labelIdx === -1) return undefined;
         const pStart = html.lastIndexOf('<p>', labelIdx);
         if (pStart === -1) return undefined;
         const pEnd = html.indexOf('</p>', labelIdx);
         if (pEnd === -1) return undefined;
-        const pContent = html.substring(pStart, pEnd);
+        return html.substring(pStart, pEnd);
+    };
+
+    const extractFromParagraph = (label: string): string | undefined => {
+        const pContent = getParagraph(label);
+        if (!pContent) return undefined;
         const strongMatch = pContent.match(/<strong>([^<]+)<\/strong>/);
         if (!strongMatch) return undefined;
         const value = strongMatch[1].trim();
         return value.length > 0 ? value : undefined;
     };
+
     data.faculty = extractFromParagraph('Факультет');
-    const specialtyPIdx = html.indexOf('Спеціальність');
-    if (specialtyPIdx !== -1) {
-        const pStart = html.lastIndexOf('<p>', specialtyPIdx);
-        const pEnd = html.indexOf('</p>', specialtyPIdx);
-        if (pStart !== -1 && pEnd !== -1) {
-            const pContent = html.substring(pStart, pEnd);
-            const specialtyMatch =
-                pContent.match(/<strong>"([^"]+)"<\/strong>/) ||
-                pContent.match(/<strong>([^<]+)<\/strong>/);
-            if (specialtyMatch) data.specialty = specialtyMatch[1].trim();
+
+    // Нова розмітка: <p><strong>Спеціальність "А4 Середня освіта"</strong></p>
+    const specialtyP = getParagraph('Спеціальність');
+    if (specialtyP) {
+        const specialtyMatch = specialtyP.match(/<strong>([^<]+)<\/strong>/);
+        if (specialtyMatch) {
+            data.specialty = specialtyMatch[1]
+                .replace(/^Спеціальність\s*/, '')
+                .replace(/["«»“”]/g, '')
+                .replace(/^[A-ZА-ЯІЇЄҐ]\d+(\.\d+)?\s+/, '') // код на кшталт "А4 "
+                .trim();
         }
     }
 
     data.degree = extractFromParagraph('Ступінь / Освітньо-професійний ступінь');
-    data.group = extractFromParagraph('Группа');
+    data.group = extractFromParagraph('Група'); // було "Группа"
     data.studyForm = extractFromParagraph('Форма навчання');
     data.paymentForm = extractFromParagraph('Форма оплати навчання');
     data.studyDuration = extractFromParagraph('Термін навчання');
     data.graduationDate = extractFromParagraph('Дата закінчення навчання');
-    const orderIdx = html.indexOf('Наказ на зарахування');
-    if (orderIdx !== -1) {
-        const pStart = html.lastIndexOf('<p>', orderIdx);
-        const pEnd = html.indexOf('</p>', orderIdx);
-        if (pStart !== -1 && pEnd !== -1) {
-            const pContent = html.substring(pStart, pEnd);
-            const orderMatch = pContent.match(
-                /Наказ на зарахування\s+<strong>([^<]+)<\/strong>\s+від\s+<strong>([^<]+)<\/strong>/,
-            );
-            if (orderMatch) {
-                data.enrollmentOrder = orderMatch[1].trim();
-                data.enrollmentDate = orderMatch[2].trim();
-            }
+
+    // Тепер після мітки є двокрапка: "Наказ на зарахування: <strong>..</strong> від <strong>..</strong>"
+    const orderP = getParagraph('Наказ на зарахування');
+    if (orderP) {
+        const orderMatch = orderP.match(
+            /Наказ на зарахування:?\s*<strong>([^<]+)<\/strong>\s*від\s*<strong>([^<]+)<\/strong>/,
+        );
+        if (orderMatch) {
+            data.enrollmentOrder = orderMatch[1].trim();
+            data.enrollmentDate = orderMatch[2].trim();
         }
     }
 
     return data;
-}
-
-/**
- * Витягує значення з HTML після label до кінця li тегу
- */
-function extractStrongValue(html: string, label: string): string | undefined {
-    const labelIdx = html.indexOf(label);
-    if (labelIdx === -1) return undefined;
-    const liStart = html.lastIndexOf('<li>', labelIdx);
-    if (liStart === -1) return undefined;
-    const liEnd = html.indexOf('</li>', labelIdx);
-    if (liEnd === -1) return undefined;
-    const liContent = html.substring(liStart, liEnd);
-    const strongMatch = liContent.match(/<strong>(.*?)<\/strong>/);
-    if (!strongMatch) return undefined;
-
-    const value = strongMatch[1].trim();
-    return value.length > 0 ? value : undefined;
-}
-
-/**
- * Витягує повне ім'я з h3 тегу
- */
-function extractFullName(html: string): string | undefined {
-    const h2Idx = html.indexOf('<h2>Анкетні дані студента</h2>');
-    if (h2Idx === -1) return undefined;
-
-    const h3Match = html.substring(h2Idx).match(/<h3>([^<]+)<\/h3>/);
-    if (!h3Match) return undefined;
-
-    return h3Match[1].trim();
 }
 
 /**
