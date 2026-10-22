@@ -82,7 +82,7 @@ export async function getDataTeacher(sesId, sessGUID) {
  * //   ...інші
  * // }
  * ```
- * @returns Об'єкт з запарсеними даними {@link Data}
+ * @returns Об'єкт з запарсеними даними {@link DataStudent}
  */
 export async function getDataStudent(sesId, sessGUID) {
     try {

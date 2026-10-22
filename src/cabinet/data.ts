@@ -88,7 +88,7 @@ export async function getDataTeacher(sesId: string, sessGUID: string): Promise<D
  * //   ...інші
  * // }
  * ```
- * @returns Об'єкт з запарсеними даними {@link Data}
+ * @returns Об'єкт з запарсеними даними {@link DataStudent}
  */
 export async function getDataStudent(sesId: string, sessGUID: string): Promise<DataStudent> {
     try {

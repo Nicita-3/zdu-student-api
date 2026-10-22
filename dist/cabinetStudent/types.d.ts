@@ -94,7 +94,7 @@ export interface Disciplines {
  * - `date` — Дата заняття у форматі "dd.mm.yyyy" (undefined для модульних днів)
  * - `type` — Тип заняття: "Лек", "ПрСем", "Лаб", "МК", "Екз", "МД"
  * - `time` — Час заняття у форматі "HH:MM-HH:MM"
- * - `index` — Значення атрибута `data-ind`, унікальний ідентифікатор
+ * - `index` — Значення атрибута `data-ind` (ID заняття), для модульних днів - `module_М#`
  * - `description` — Опис заняття (може бути undefined) ("Модуль ##" для модульних днів, де ## - номер модуля, наприклад М0, М1)
  */
 export interface ScheduleItem {
@@ -106,17 +106,15 @@ export interface ScheduleItem {
     description?: string;
 }
 /**
- * Список оцінок студента.
+ * Оцінки поточного студента з предмета.
  * @category CabinetStudent
  * @remarks
- * - `id` — Унікальний ідентифікатор студента
- * - `scores` — Оцінки по днях, масив масивів рядків (перший елемент - основна оцінка, другий елемент - оцінка перездачі)
+ * - `scores` — Оцінки по заняттях у порядку {@link Scores.scheduleItem}, масив масивів рядків (для заняття: перший елемент - основна оцінка, другий - оцінка перездачі; для модуля - один елемент з сумою балів за модуль)
  * - `absences` — Кількість пропусків
- * - `uabsences` — Кількість невиправлених пропусків
- * - `finalScore` — Фінальна оцінка
+ * - `uabsences` — Кількість невиправданих пропусків
+ * - `finalScore` — Фінальна оцінка (сума балів за семестр)
  */
 export interface StudentScores {
-    id: string;
     scores: string[][];
     absences: number;
     uabsences: number;
@@ -126,16 +124,18 @@ export interface StudentScores {
  * Об'єкт оцінок з предмету.
  * @category CabinetStudent
  * @remarks
- * - `ok` — Успіх отримання токену
+ * Журнал показує лише оцінки студента, який переглядає сторінку,
+ * тому `studentScores` містить тільки оцінки поточного студента.
+ * - `ok` — Успіх отримання оцінок
  * - `prId` — Айді дисципліни
- * - `studentId` — Унікальний айді студента для предметів
- * - `scheduleItem` — Опис заняття у кабінеті студента {@link ScheduleItem}
- * - `studentScores` — Список оцінок студента {@link StudentScores}
+ * - `name` — Назва дисципліни
+ * - `scheduleItem` — Опис занять у кабінеті студента {@link ScheduleItem}
+ * - `studentScores` — Оцінки поточного студента {@link StudentScores} (undefined, якщо журнал порожній)
  */
 export interface Scores {
     ok: boolean;
     prId: string;
-    studentId?: string;
+    name?: string;
     scheduleItem: ScheduleItem[];
-    studentScores: StudentScores[];
+    studentScores?: StudentScores;
 }

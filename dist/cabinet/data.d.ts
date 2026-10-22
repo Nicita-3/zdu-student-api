@@ -61,6 +61,6 @@ export declare function getDataTeacher(sesId: string, sessGUID: string): Promise
  * //   ...інші
  * // }
  * ```
- * @returns Об'єкт з запарсеними даними {@link Data}
+ * @returns Об'єкт з запарсеними даними {@link DataStudent}
  */
 export declare function getDataStudent(sesId: string, sessGUID: string): Promise<DataStudent>;

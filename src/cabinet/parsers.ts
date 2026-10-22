@@ -139,20 +139,34 @@ function parseFullName(fullName: string): {
  */
 export function parseDisciplinesPageN6(html: string): Discipline[] {
     const result: Discipline[] = [];
-    const rowRegex =
-        /<tr>\s*<td>([^<]+)<\/td>\s*<td>\d+<\/td>\s*<td>[\s\S]*?<a[^>]+href="[^"]*prID=(\d+)[^"]*"[\s\S]*?<\/a>[\s\S]*?<\/td>\s*<\/tr>/gi;
+    const tbody = html.match(/<tbody>([\s\S]*?)<\/tbody>/i)?.[1] ?? html;
+    const rowRegex = /<tr>([\s\S]*?)<\/tr>/gi;
+    const decode = (s: string) =>
+        s
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\s+/g, ' ')
+            .trim();
 
-    let match: RegExpExecArray | null;
+    let row: RegExpExecArray | null;
+    while ((row = rowRegex.exec(tbody)) !== null) {
+        const cells = [...row[1].matchAll(/<td[^>]*>([\s\S]*?)<\/td>/gi)].map((c) => c[1]);
+        if (cells.length < 3) continue;
 
-    while ((match = rowRegex.exec(html)) !== null) {
-        const name = match[1].trim();
-        const prId = match[2].trim();
+        const prId = cells[2].match(/prID=(\d+)/)?.[1];
+        const name = decode(cells[0].replace(/<[^>]+>/g, ''));
+        if (!name || !prId) continue;
 
-        if (name && prId) {
-            result.push({ name, prId });
-        }
+        const scoreText = decode(cells[2].replace(/<[^>]+>/g, ''));
+        const hasScore = /^\d+\s*\//.test(scoreText); // "82 / B / 4"
+        result.push({
+            name,
+            prId,
+            // hours: Number(decode(cells[1])),
+            // score: hasScore ? scoreText : undefined,
+        });
     }
-
     return result;
 }
 
@@ -162,15 +176,19 @@ export function parseDisciplinesPageN6(html: string): Discipline[] {
  */
 export function parseDisciplinesPageN7(html: string): Discipline[] {
     const disciplines: Discipline[] = [];
-    const optionRegex = /<option\s+value="(\d+)">([\s\S]*?)<\/option>/g;
+    const selectMatch = html.match(/<select[^>]*\bid="prt"[^>]*>([\s\S]*?)<\/select>/);
+    const scope = selectMatch ? selectMatch[1] : html;
+    const optionRegex = /<option\b[^>]*\bvalue="(\d+)"[^>]*>([\s\S]*?)<\/option>/g;
     let match: RegExpExecArray | null;
 
-    while ((match = optionRegex.exec(html)) !== null) {
-        const value = match[1];
-        const name = match[2].trim();
-        if (value !== '-1') {
-            disciplines.push({ prId: value, name });
-        }
+    while ((match = optionRegex.exec(scope)) !== null) {
+        const name = match[2]
+            .replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\s+/g, ' ')
+            .trim();
+        if (name) disciplines.push({ prId: match[1], name });
     }
 
     return disciplines;
@@ -229,7 +247,7 @@ export function parseTeacherData(html: string): DataTeacher {
  * Витягує повне ім'я викладача з h2 тегу
  */
 function extractTeacherFullName(html: string): string | undefined {
-    const h2Match = html.match(/<h2>Викладач:\s*([^<]+)<\/h2>/);
+    const h2Match = html.match(/<h2[^>]*>Викладач:\s*([^<]+)<\/h2>/);
     if (!h2Match) return undefined;
     return h2Match[1].trim();
 }
@@ -238,7 +256,7 @@ function extractTeacherFullName(html: string): string | undefined {
  * Витягує назву кафедри з h3 тегу
  */
 function extractDepartment(html: string): string | undefined {
-    const h3Match = html.match(/<h3>Кафедра:\s*([^<]+)<\/h3>/);
+    const h3Match = html.match(/<h3[^>]*>Кафедра:\s*([^<]+)<\/h3>/);
     if (!h3Match) return undefined;
     return h3Match[1].trim();
 }
@@ -263,6 +281,7 @@ function extractNumericValue(html: string, regex: RegExp): number | undefined {
     return isNaN(value) ? undefined : value;
 }
 
+// TODO TEST
 /**
  * Парсить сторінку зі списком академічних груп викладача
  * @param html - HTML сторінки "Академічні групи"
@@ -272,7 +291,7 @@ export function parseGroupsPage(html: string, semester: number): AcademicGroup[]
     try {
         const groups: AcademicGroup[] = [];
         const rowRegex =
-            /<tr><td><a[^>]+href="\.\/teachers\.cgi\?sesID=[^"]+&n=1&grp=([^"&]+)&teacher=(\d+)"[^>]*>([^<]+)<\/a><\/td><td[^>]*>(\d+)<\/td><td>([^<]+?)<br\s*\/>\s*<em>([^<]+)<\/em><\/td><\/tr>/gi;
+            /<tr[^>]*>\s*<td[^>]*>\s*<a[^>]+href="\.\/teachers\.cgi\?sesID=[^"]+?&(?:amp;)?n=1&(?:amp;)?grp=([^"&]+)&(?:amp;)?teacher=(\d+)"[^>]*>([^<]+)<\/a>\s*<\/td>\s*<td[^>]*>(\d+)<\/td>\s*<td[^>]*>([^<]+?)<br\s*\/?>\s*<em>([^<]+)<\/em>\s*<\/td>\s*<\/tr>/gi;
 
         let match: RegExpExecArray | null;
 

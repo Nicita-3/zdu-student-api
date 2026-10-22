@@ -112,7 +112,7 @@ export class CabinetTeacher {
     }
     /**
      * Отримати анкетні данні викладача
-     * @returns Об'єкт {@link Data}
+     * @returns Об'єкт {@link DataTeacher}
      */
     async getData() {
         if (!this.sesID || !this.sessGUID)

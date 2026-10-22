@@ -21,10 +21,9 @@ API для **Житомирського державного університ�
 - 🔐 Авторизація в кабінеті студента
 - 📝 Отримання анкетних даних студента (ПІБ, дата народження, стать, контакти, факультет, спеціальність, група, форма навчання)
 - 📖 Отримання дисциплін поточного семестру
-- 📊 Отримання оцінок з окремого предмета (з деталізацією по заняттях, пропускам та фінальною оцінкою)
-- 📈 Отримання оцінок з усіх дисциплін одночасно
+- 📊 Отримання своїх оцінок з окремого предмета (з деталізацією по заняттях, пропускам та фінальною оцінкою)
+- 📈 Отримання своїх оцінок з усіх дисциплін одночасно
 - 🎓 Отримання оцінок за конкретний семестр (1 або 2)
-- 🆔 Отримання ID студента в системі оцінювання
 - 💾 Відновлення попередньої сесії без повторної авторизації
 - ✅ Перевірка валідності поточної сесії
 - 🔄 Автоматичне визначення поточного семестру
@@ -224,6 +223,12 @@ await cabinet.auth();
 const disciplines = await cabinet.getDisciplines();
 console.log('Дисципліни:', disciplines);
 
+// Отримати оцінки з окремого предмета (prId береться зі списку дисциплін)
+const scores = await cabinet.getScores(disciplines.disciplines[0].prId);
+console.log('Предмет:', scores.name);
+console.log('Заняття:', scores.scheduleItem);
+console.log('Мої оцінки:', scores.studentScores);
+
 // Отримати оцінки з усіх дисциплін
 const allScores = await cabinet.getAllScores();
 console.log('Всі оцінки:', allScores);
@@ -231,6 +236,33 @@ console.log('Всі оцінки:', allScores);
 // Отримати оцінки за конкретний семестр
 const firstSemesterScores = await cabinet.getAllScores(1);
 const secondSemesterScores = await cabinet.getAllScores(2);
+const oneSubjectSecondSemester = await cabinet.getScores('55379', 2);
+```
+
+> ℹ️ Журнал університету показує лише оцінки студента, який авторизований.
+> Рядки інших студентів анонімізовані, тому бібліотека повертає тільки ваші оцінки.
+
+Приклад результату `getScores`:
+
+```ts
+{
+  ok: true,
+  prId: '55377',
+  name: 'Історичне джерелознавство',
+  scheduleItem: [
+    { teacher: 'Іванов І.І.', date: '15.09.2026', type: 'ПрСем', time: '11:30-12:50', index: '865161', description: undefined },
+    { teacher: 'Іванов І.І.', date: '01.10.2026', type: 'ПрСем', time: '11:30-12:50', index: '872194', description: undefined },
+    { teacher: undefined, date: undefined, type: 'МД', time: '', index: 'module_М1', description: 'Модуль М1' }
+  ],
+  studentScores: {
+    // по одному елементу на кожне заняття з scheduleItem:
+    // [основна оцінка, перездача] для заняття, [сума балів] для модуля
+    scores: [['', ''], ['90', ''], ['90']],
+    absences: 0,   // пропусків
+    uabsences: 0,  // невиправданих пропусків
+    finalScore: '90'
+  }
+}
 ```
 
 ---
@@ -263,18 +295,6 @@ await cabinet.auth();
 // Перевірити чи сесія ще дійсна
 const isValid = await cabinet.isValidSession();
 console.log('Сесія дійсна:', isValid);
-```
-
----
-
-### Отримання ID студента
-
-```ts
-const cabinet = new CabinetStudent('ПРІЗВИЩЕ', 'ПАРОЛЬ');
-await cabinet.auth();
-
-const studentId = await cabinet.getId();
-console.log('ID студента:', studentId);
 ```
 
 ---

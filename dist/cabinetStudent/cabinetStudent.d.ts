@@ -29,17 +29,13 @@ export declare class CabinetStudent {
      */
     disciplines: Discipline[];
     /**
-     * Данні студента {@link Data}
+     * Данні студента {@link DataStudent}
      */
     data?: DataStudent;
     /**
-     * Оціки з усіх предметів {@link Scores}
+     * Оцінки з усіх предметів {@link Scores}
      */
     allScores?: Scores[];
-    /**
-     * Айді в системі оцінювання
-     */
-    private id?;
     /**
      * Конструктор
      * @param login - Прізвище користувача
@@ -52,7 +48,7 @@ export declare class CabinetStudent {
     auth(login?: string, password?: string): Promise<boolean>;
     /**
      * Встановити семестр
-     * @param password - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
+     * @param semester - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
      */
     setSemester(semester?: 1 | 2 | '1' | '2'): void;
     /**
@@ -74,7 +70,7 @@ export declare class CabinetStudent {
     getDisciplines(): Promise<Disciplines>;
     /**
      * Отримати анкетні данні студента
-     * @returns Об'єкт {@link Data}
+     * @returns Об'єкт {@link DataStudent}
      */
     getData(): Promise<DataStudent>;
     /**
@@ -83,11 +79,16 @@ export declare class CabinetStudent {
      */
     getCourse(): Promise<number | undefined>;
     /**
-     * Отримати оцінки з всіх предметів
+     * Отримати свої оцінки з окремого предмета
+     * @param prId - ID дисципліни (див. {@link Discipline})
+     * @param semester - Семестр, за замовчуванням {@link CabinetStudent.semester}
+     * @returns Оцінки з предмета {@link Scores}
+     */
+    getScores(prId: string, semester?: 1 | 2): Promise<Scores>;
+    /**
+     * Отримати свої оцінки з усіх предметів поточного семестру
+     * @param semester - Семестр, за замовчуванням {@link CabinetStudent.semester}
+     * @returns Масив оцінок {@link Scores} (тільки успішно отримані предмети)
      */
     getAllScores(semester?: 1 | 2): Promise<Scores[]>;
-    /**
-     * Отримати айді в системі оцінювання
-     */
-    getId(): Promise<string | undefined>;
 }

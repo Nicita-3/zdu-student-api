@@ -41,19 +41,14 @@ export class CabinetStudent {
     public disciplines: Discipline[] = [];
 
     /**
-     * Данні студента {@link Data}
+     * Данні студента {@link DataStudent}
      */
     public data?: DataStudent;
 
     /**
-     * Оціки з усіх предметів {@link Scores}
+     * Оцінки з усіх предметів {@link Scores}
      */
     public allScores?: Scores[];
-
-    /**
-     * Айді в системі оцінювання
-     */
-    private id?: string;
 
     /**
      * Конструктор
@@ -85,7 +80,7 @@ export class CabinetStudent {
 
     /**
      * Встановити семестр
-     * @param password - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
+     * @param semester - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
      */
     public setSemester(semester?: 1 | 2 | '1' | '2') {
         if (!semester) this.semester = getSemester();
@@ -145,7 +140,7 @@ export class CabinetStudent {
 
     /**
      * Отримати анкетні данні студента
-     * @returns Об'єкт {@link Data}
+     * @returns Об'єкт {@link DataStudent}
      */
     public async getData(): Promise<DataStudent> {
         if (!this.sesID || !this.sessGUID) return { ok: false };
@@ -198,56 +193,41 @@ export class CabinetStudent {
     }
 
     /**
-     * Отримати оцінки з всіх предметів
+     * Отримати свої оцінки з окремого предмета
+     * @param prId - ID дисципліни (див. {@link Discipline})
+     * @param semester - Семестр, за замовчуванням {@link CabinetStudent.semester}
+     * @returns Оцінки з предмета {@link Scores}
      */
-    public async getAllScores(semester?: 1 | 2): Promise<Scores[]> {
-        if (!this.sesID || !this.sessGUID) return [];
-        if (!this.disciplines?.length) return [];
-
-        const targetSemester = semester ?? this.semester;
-        const allScores: Scores[] = [];
-
+    public async getScores(prId: string, semester?: 1 | 2): Promise<Scores> {
+        const empty: Scores = { ok: false, prId, scheduleItem: [] };
+        if (!this.sesID || !this.sessGUID) return empty;
         try {
-            for (const discipline of this.disciplines) {
-                const scores = await getScores(
-                    this.sesID,
-                    this.sessGUID,
-                    discipline.prId,
-                    targetSemester,
-                );
-
-                if (scores.ok) {
-                    allScores.push(scores);
-                }
-            }
-
-            this.allScores = allScores;
-            return allScores;
+            return await getScores(this.sesID, this.sessGUID, prId, semester ?? this.semester);
         } catch {
-            return [];
+            return empty;
         }
     }
 
     /**
-     * Отримати айді в системі оцінювання
+     * Отримати свої оцінки з усіх предметів поточного семестру
+     * @param semester - Семестр, за замовчуванням {@link CabinetStudent.semester}
+     * @returns Масив оцінок {@link Scores} (тільки успішно отримані предмети)
      */
-    public async getId(): Promise<string | undefined> {
-        if (this.id) return this.id;
-        if (!this.sesID || !this.sessGUID) return undefined;
-        if (!this.disciplines?.length) {
-            await this.getDisciplines();
+    public async getAllScores(semester?: 1 | 2): Promise<Scores[]> {
+        if (!this.sesID || !this.sessGUID) return [];
+        if (!this.disciplines?.length) await this.getDisciplines();
+        if (!this.disciplines?.length) return [];
+
+        const allScores: Scores[] = [];
+        for (const discipline of this.disciplines) {
+            const scores = await this.getScores(discipline.prId, semester);
+            if (scores.ok) {
+                scores.name ??= discipline.name;
+                allScores.push(scores);
+            }
         }
-        if (!this.disciplines?.length) return undefined;
-        try {
-            const result = await getScores(
-                this.sesID,
-                this.sessGUID!,
-                this.disciplines[0].prId,
-                this.semester,
-            );
-            return result.studentId;
-        } catch {
-            return undefined;
-        }
+
+        this.allScores = allScores;
+        return allScores;
     }
 }

@@ -1,5 +1,6 @@
+import { CabinetStudent, } from './index.js';
 import 'dotenv/config';
-// import process from 'process';
+import process from 'node:process';
 // import { writeFile } from 'fs/promises';
 // const schedule = new Schedule();
 // schedule.group = '23Бд-СОінф123'
@@ -55,46 +56,32 @@ import 'dotenv/config';
 // const data = await getDisciplines(sesID, sessGUID);
 // const data = await getСurrentDisciplines(sesID, sessGUID);
 // console.log(data);
-// const data2 = await getScores(sesID, sessGUID, '43910', 0);
-// // console.log(data2);
-// const me = data2.studentScores.find((s) => s.id === data2.studentId)!;
+// const data2 = await getScores(sesID, sessGUID, '43910', 1);
+// console.log(data2.studentScores);
 // const sesID = '';
 // const sessGUID = '';
-// const cb = new CabinetStudent(process.env.LOGIN!, process.env.PASSWORD!);
-// await cb.auth();
-// // // console.log(cb.sesID, cb.sessGUID);
-// // console.log(await cb.setSession(sesID, sessGUID));
-// // // console.log(cb.sesID, cb.sessGUID);
+const cb = new CabinetStudent(process.env.LOGIN2, process.env.PASSWORD2);
+await cb.auth();
+console.log(cb.sesID, cb.sessGUID);
+await cb.loadData();
+console.log(cb.disciplines);
+// Оцінки з окремого предмета
+const one = await cb.getScores(cb.disciplines[0].prId);
+console.log(one.name, one.scheduleItem, one.studentScores);
+// Оцінки з усіх предметів (вже завантажені в loadData)
+printFinalScores(cb.allScores);
+// console.log(await cb.setSession(sesID, sessGUID));
+// // console.log(cb.sesID, cb.sessGUID);
 // await cb.loadData();
 // const scores = cb.allScores;
-// await writeFile('scores.json', JSON.stringify(scores![14], null, 2));
+// await writeFile('scores.json', JSON.stringify(cb.disciplines, null, 2));
 // console.log(cb.data);
-// await cb.getDisciplines();
-// console.log(await cb.getId());
-// console.log(cb.allScores);
-// printFinalScores(cb.allScores!, cb.disciplines);
-// function printFinalScores(scoresArray: Scores[], disciplines: Discipline[]) {
-//     // Створюємо мапу prId → name для швидкого доступу
-//     const disciplineMap: Record<string, string> = {};
-//     for (const d of disciplines) {
-//         disciplineMap[d.prId] = d.name;
-//     }
-//     const result: Record<string, Record<string, string>> = {};
-//     for (const scoresObj of scoresArray) {
-//         const disciplineId = scoresObj.prId;
-//         const disciplineName = disciplineMap[disciplineId] ?? disciplineId;
-//         for (const student of scoresObj.studentScores) {
-//             if (!result[student.id]) result[student.id] = {};
-//             result[student.id][disciplineName] = student.finalScore;
-//         }
-//     }
-//     for (const studentId in result) {
-//         console.log(`Student ${studentId}:`);
-//         for (const disciplineName in result[studentId]) {
-//             console.log(`  ${disciplineName}: ${result[studentId][disciplineName]}`);
-//         }
-//     }
-// }
+function printFinalScores(scoresArray) {
+    for (const scoresObj of scoresArray) {
+        const s = scoresObj.studentScores;
+        console.log(`${scoresObj.name ?? scoresObj.prId}: ${s?.finalScore || '-'} (пропусків: ${s?.absences ?? 0}, невиправд.: ${s?.uabsences ?? 0})`);
+    }
+}
 // const sesID = '';
 // const sessGUID = '';
 // const cb = new CabinetTeacher(process.env.LOGINT!, process.env.PASSWORDT!);

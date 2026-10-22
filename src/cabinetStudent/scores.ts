@@ -1,18 +1,21 @@
 import fetch from 'cross-fetch';
 import iconv from 'iconv-lite';
-import { Disciplines, ScheduleItem, Scores, StudentScores } from './types.js';
+import { ScheduleItem, Scores, StudentScores } from './types.js';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';
 import { Buffer } from 'buffer';
 
 /**
- * Отримати оцінки вибраного предмета студента
+ * Отримати оцінки поточного студента з вибраного предмета
  * @category CabinetStudent
+ * @remarks
+ * Журнал показує лише оцінки студента, який переглядає сторінку,
+ * рядки інших студентів анонімізовані, тому вони не повертаються.
  * @param sesId - ID сесії користувача
  * @param sessGUID - GUID сесії з cookie
  * @param prId - ID дисципліни
  * @param semester - Семестр
  * @throws {Error} Якщо виникають проблеми з запитом або дані некоректні.
- * @returns Масив дисциплін {@link Disciplines}
+ * @returns Оцінки з предмета {@link Scores}
  */
 export async function getScores(
     sesId: string,
@@ -24,9 +27,7 @@ export async function getScores(
         const result: Scores = {
             ok: false,
             prId: prId,
-            studentId: '',
             scheduleItem: [],
-            studentScores: [],
         };
         const cookieString = generateCookieString(sessGUID);
         const formData = `n=7&sesID=${sesId}&teacher=0&irc=0&tid=0&CYKLE=-1&prt=${prId}&hlf=${semester === 1 ? 0 : 1}&grade=0&m=-1`;
@@ -41,15 +42,17 @@ export async function getScores(
             },
         );
         const buffer1 = await response1.arrayBuffer();
-        let html1 = iconv.decode(Buffer.from(buffer1), 'windows-1251');
+        const html1 = iconv.decode(Buffer.from(buffer1), 'windows-1251');
         if (isLoginPage(html1)) return result;
-        result.scheduleItem = parseSchedule(html1);
-        result.studentScores = parseScores(html1, result.scheduleItem.length);
-        result.studentId = result.studentScores[0]?.id;
-        if (result.studentScores.length > 1) {
-            result.studentScores.sort((a, b) => a.id.localeCompare(b.id));
-        }
 
+        const columns = extractJsArray(html1, 'tableColumns');
+        const rows = extractJsArray(html1, 'rowsData');
+        if (columns === undefined || rows === undefined) return result;
+
+        result.name = parseDisciplineName(html1, prId);
+        const { items, fields } = parseSchedule(columns, html1);
+        result.scheduleItem = items;
+        result.studentScores = parseScores(rows, fields);
         result.ok = true;
         return result;
     } catch (e) {
@@ -59,208 +62,130 @@ export async function getScores(
 }
 
 /**
- * Витягує список пар з HTML
+ * Витягує текст JS-масиву `var name = [...];` зі сторінки журналу
  */
-function parseSchedule(html: string): ScheduleItem[] {
-    let idx = html.indexOf('<thead>');
-    if (idx === -1) return [];
-    let theadEnd = html.indexOf('</thead>', idx);
-    if (theadEnd === -1) return [];
-    let theadContent = html.slice(idx, theadEnd);
-
-    let firstTrStart = theadContent.indexOf('<tr>');
-    let firstTrEnd = theadContent.indexOf('</tr>', firstTrStart);
-    if (firstTrStart === -1 || firstTrEnd === -1) return [];
-    let firstRow = theadContent.slice(firstTrStart, firstTrEnd);
-
-    let secondTrStart = theadContent.indexOf('<tr>', firstTrEnd);
-    let secondTrEnd = theadContent.indexOf('</tr>', secondTrStart);
-    let thirdTrStart = theadContent.indexOf('<tr>', secondTrEnd);
-    let thirdTrEnd = theadContent.indexOf('</tr>', thirdTrStart);
-    if (thirdTrStart === -1 || thirdTrEnd === -1) return [];
-    let thirdRow = theadContent.slice(thirdTrStart, thirdTrEnd);
-
-    // Збираємо всі data-ind з thead в порядку появи (вони у другому рядку)
-    const allInds: string[] = [];
-    const indRegex = /data-ind="([^"]+)"/g;
-    let indMatch: RegExpExecArray | null;
-    while ((indMatch = indRegex.exec(theadContent)) !== null) {
-        allInds.push(indMatch[1]);
-    }
-
-    const result: ScheduleItem[] = [];
-    const thStartRegex = /<th\b/g;
-    const positions: number[] = [];
-    let match: RegExpExecArray | null;
-
-    while ((match = thStartRegex.exec(firstRow)) !== null) {
-        positions.push(match.index);
-    }
-    positions.push(firstRow.length);
-
-    const thirdPositions: number[] = [];
-    const thirdThStartRegex = /<th\b/g;
-    while ((match = thirdThStartRegex.exec(thirdRow)) !== null) {
-        thirdPositions.push(match.index);
-    }
-    thirdPositions.push(thirdRow.length);
-
-    let indIdx = 0;
-
-    for (let i = 0; i < positions.length - 1; i++) {
-        const start = positions[i];
-        const end = positions[i + 1];
-        const thFull = firstRow.slice(start, end);
-
-        const closeIdx = thFull.indexOf('</th>');
-        if (closeIdx === -1) continue;
-
-        const thTag = thFull.slice(0, closeIdx + 5);
-        const thContent = thTag.replace(/<th[^>]*>/, '').replace(/<\/th>/, '');
-
-        if (!thContent.trim()) continue;
-
-        let moduleMatch = thContent.match(/^(М\d+)<br>/);
-        if (moduleMatch) {
-            const moduleNum = moduleMatch[1];
-            const timeMatch = thContent.match(/<br[^>]*>\s*(\d{2}:\d{2}-\d{2}:\d{2})/);
-            const time = timeMatch ? timeMatch[1].trim() : '';
-            result.push({
-                teacher: undefined,
-                date: undefined,
-                type: 'МД',
-                time: time,
-                index: `module_${moduleNum}`,
-                description: `Модуль ${moduleNum}`,
-            });
-            continue;
-        }
-
-        if (thContent.match(/Підсум\.|Всього|Невиправд\./)) {
-            continue;
-        }
-
-        const dataHthMatch = thTag.match(/data-hth="([^"]+)"/);
-        if (!dataHthMatch) continue;
-
-        const dataHth = dataHthMatch[1];
-
-        let index: string;
-        const aMatch = thContent.match(/data-ind="([^"]+)"/);
-        if (aMatch) {
-            index = aMatch[1];
-        } else {
-            if (indIdx >= allInds.length) continue;
-            index = allInds[indIdx];
-        }
-        indIdx++;
-
-        const dateMatch = thContent.match(/(\d{2}\.\d{2}\.\d{4})/);
-        const date = dateMatch ? dateMatch[1] : '';
-        const timeMatch = thContent.match(/<br[^>]*>\s*(\d{2}:\d{2}-\d{2}:\d{2})/);
-        const time = timeMatch ? timeMatch[1].trim() : '';
-        const parts = dataHth.split(',').map((p) => p.trim());
-        const teacher = parts[0] || '';
-
-        let type = '';
-        if (parts[1]) {
-            const dateTypeParts = parts[1].split(/\s+/);
-            type = dateTypeParts[1] || '';
-        }
-
-        result.push({ teacher, date, type, time, index });
-    }
-
-    const descriptions = parseDescriptions(html);
-    for (const item of result) {
-        if (item.index && !item.index.startsWith('module_') && descriptions.has(item.index)) {
-            item.description = descriptions.get(item.index);
-        }
-    }
-
-    return result;
+function extractJsArray(html: string, name: string): string | undefined {
+    const start = html.indexOf(`var ${name} = [`);
+    if (start === -1) return undefined;
+    const end = html.indexOf('];', start);
+    if (end === -1) return undefined;
+    return html.slice(start + `var ${name} = `.length, end + 1);
 }
 
 /**
- * Витягує описи занять з HTML
+ * Витягує назву дисципліни з вибраного option у select[id="prt"]
+ */
+function parseDisciplineName(html: string, prId: string): string | undefined {
+    const m = html.match(new RegExp(`<option\\b[^>]*value="${prId}"[^>]*>([^<]*)`));
+    const name = m?.[1]
+        .replace(/&quot;/g, '"')
+        .replace(/\s+/g, ' ')
+        .trim();
+    return name || undefined;
+}
+
+/**
+ * Витягує список занять з опису колонок журналу (`tableColumns`)
+ * @returns Заняття та відповідні їм поля в рядку оцінок (`L0a`, `L0b`, `L6`, ...)
+ */
+function parseSchedule(
+    columns: string,
+    html: string,
+): { items: ScheduleItem[]; fields: string[][] } {
+    const items: ScheduleItem[] = [];
+    const fields: string[][] = [];
+    const descriptions = parseDescriptions(html);
+
+    // Кожна колонка заняття/модуля починається з заголовка у <span style="white-space:nowrap;">
+    const groups = columns.split(`{title:'<span style="white-space:nowrap;">`).slice(1);
+    for (const group of groups) {
+        const groupFields = [...group.matchAll(/field:'(L\d+[ab]?)'/g)].map((m) => m[1]);
+        if (!groupFields.length) continue;
+
+        const moduleMatch = group.match(/^(М\d+)<\/span>/);
+        if (moduleMatch) {
+            const moduleNum = moduleMatch[1];
+            items.push({
+                teacher: undefined,
+                date: undefined,
+                type: 'МД',
+                time: '',
+                index: `module_${moduleNum}`,
+                description: `Модуль ${moduleNum}`,
+            });
+            fields.push(groupFields);
+            continue;
+        }
+
+        const headMatch = group.match(/data-ind="(\d+)" data-head="([^"]*)"/);
+        if (!headMatch) continue;
+        const index = headMatch[1];
+        const [date = '', type = ''] = headMatch[2].split(/\s+/);
+        const time = group.match(/<br>\s*(\d{2}:\d{2}-\d{2}:\d{2})/)?.[1] ?? '';
+        const tooltip = group.match(/headerTooltip:'([^']*)'/)?.[1] ?? '';
+        const teacher = tooltip.split(',')[0].trim();
+
+        items.push({ teacher, date, type, time, index, description: descriptions.get(index) });
+        fields.push(groupFields);
+    }
+
+    return { items, fields };
+}
+
+/**
+ * Витягує описи занять з HTML (`<div id="r{index}" class="d-none">Опис<br>...</div>`)
  */
 function parseDescriptions(html: string): Map<string, string> {
     const descriptions = new Map<string, string>();
-    const divRegex = /<div\s+id="(r\d+)"\s+class="hidden">\s*([\s\S]*?)\s*<br>/g;
+    const divRegex = /<div\s+id="r(\d+)"\s+class="d-none">([\s\S]*?)<\/div>/g;
     let match: RegExpExecArray | null;
 
     while ((match = divRegex.exec(html)) !== null) {
-        const index = match[1];
-        const content = match[2].trim();
-
-        if (content && !content.startsWith('<')) {
-            descriptions.set(index, content);
-        }
+        const content = match[2]
+            .split(/<br\s*\/?>/)[0]
+            .replace(/<[^>]+>/g, '')
+            .trim();
+        if (content) descriptions.set(match[1], content);
     }
 
     return descriptions;
 }
 
 /**
- * Витягує список оцінок з HTML
+ * Розбирає JS-масив `rowsData` на об'єкти з рядковими значеннями
  */
-function parseScores(html: string, expectedScoresCount: number): StudentScores[] {
-    const studentRows = html.match(/<tr\s+[^>]*id="s\d+"[\s\S]*?<\/tr>/g) || [];
-    const result: StudentScores[] = [];
+function parseRows(rows: string): Record<string, string>[] {
+    const result: Record<string, string>[] = [];
+    const pairRegex = /(\w+):(?:'((?:[^'\\]|\\.)*)'|([\w.-]+))/g;
+    let current: Record<string, string> | undefined;
+    let match: RegExpExecArray | null;
 
-    for (const row of studentRows) {
-        const idMatch = row.match(/id="(s\d+)"/);
-        const id = idMatch ? idMatch[1] : '';
-        const allTds = [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)];
-
-        const scoresMap = new Map<number, string[]>();
-
-        for (const tdMatch of allTds) {
-            const fullTd = tdMatch[0];
-            const tdContent = tdMatch[1].trim();
-            const dataItemMatch = fullTd.match(/data-item="(\d+)"/);
-
-            if (!dataItemMatch) continue;
-
-            const dataItem = Number(dataItemMatch[1]);
-
-            if (
-                fullTd.match(/class="[^"]*\bf\s+f1\b[^"]*"/) ||
-                fullTd.match(/class="[^"]*\bf1\b[^"]*"/)
-            ) {
-                continue;
-            }
-
-            if (
-                fullTd.match(/class="[^"]*\bf\s+f2\b[^"]*"/) ||
-                fullTd.match(/class="[^"]*\bf2\b[^"]*"/)
-            ) {
-                continue;
-            }
-
-            const score = tdContent || '';
-
-            if (!scoresMap.has(dataItem)) {
-                scoresMap.set(dataItem, [score]);
-            } else {
-                scoresMap.get(dataItem)!.push(score);
-            }
+    while ((match = pairRegex.exec(rows)) !== null) {
+        const key = match[1];
+        const value = match[2] !== undefined ? match[2].replace(/\\(.)/g, '$1') : match[3];
+        if (key === 'id') {
+            current = {};
+            result.push(current);
         }
-
-        const sortedItems = Array.from(scoresMap.entries()).sort((a, b) => a[0] - b[0]);
-        const scores = sortedItems.map(([_, values]) => values);
-
-        const finalMatch = row.match(/<td[^>]*class="[^"]*\bf\s+f1\b[^"]*"[^>]*>([\s\S]*?)<\/td>/);
-        const finalScore = finalMatch ? finalMatch[1].trim() : '';
-
-        const absenceMatches = [
-            ...row.matchAll(/<td[^>]*class="[^"]*\bf\s+f2\b[^"]*"[^>]*>([\s\S]*?)<\/td>/g),
-        ];
-        const absences = absenceMatches[0] ? Number(absenceMatches[0][1].trim() || 0) : 0;
-        const uabsences = absenceMatches[1] ? Number(absenceMatches[1][1].trim() || 0) : 0;
-
-        result.push({ id, scores, absences, uabsences, finalScore });
+        if (current) current[key] = value;
     }
 
     return result;
+}
+
+/**
+ * Витягує оцінки поточного студента з `rowsData`
+ * @remarks Рядок поточного студента — єдиний з заповненим ПІБ (`pib`), інші анонімізовані
+ */
+function parseScores(rows: string, fields: string[][]): StudentScores | undefined {
+    const parsed = parseRows(rows);
+    const row = parsed.find((r) => r.pib?.replace(/<[^>]+>/g, '').trim()) ?? parsed[0];
+    if (!row) return undefined;
+
+    return {
+        scores: fields.map((group) => group.map((field) => row[field] ?? '')),
+        absences: Number(row.propAll || 0),
+        uabsences: Number(row.propB || 0),
+        finalScore: row.sumAll ?? '',
+    };
 }

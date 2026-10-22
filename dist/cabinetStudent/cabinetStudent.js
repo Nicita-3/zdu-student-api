@@ -33,17 +33,13 @@ export class CabinetStudent {
      */
     disciplines = [];
     /**
-     * Данні студента {@link Data}
+     * Данні студента {@link DataStudent}
      */
     data;
     /**
-     * Оціки з усіх предметів {@link Scores}
+     * Оцінки з усіх предметів {@link Scores}
      */
     allScores;
-    /**
-     * Айді в системі оцінювання
-     */
-    id;
     /**
      * Конструктор
      * @param login - Прізвище користувача
@@ -68,7 +64,7 @@ export class CabinetStudent {
     }
     /**
      * Встановити семестр
-     * @param password - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
+     * @param semester - Семестр в форматі рядка або числа, якщо не передавати згенерується ймовірний семестр
      */
     setSemester(semester) {
         if (!semester)
@@ -129,7 +125,7 @@ export class CabinetStudent {
     }
     /**
      * Отримати анкетні данні студента
-     * @returns Об'єкт {@link Data}
+     * @returns Об'єкт {@link DataStudent}
      */
     async getData() {
         if (!this.sesID || !this.sessGUID)
@@ -178,48 +174,43 @@ export class CabinetStudent {
         return course;
     }
     /**
-     * Отримати оцінки з всіх предметів
+     * Отримати свої оцінки з окремого предмета
+     * @param prId - ID дисципліни (див. {@link Discipline})
+     * @param semester - Семестр, за замовчуванням {@link CabinetStudent.semester}
+     * @returns Оцінки з предмета {@link Scores}
+     */
+    async getScores(prId, semester) {
+        const empty = { ok: false, prId, scheduleItem: [] };
+        if (!this.sesID || !this.sessGUID)
+            return empty;
+        try {
+            return await getScores(this.sesID, this.sessGUID, prId, semester ?? this.semester);
+        }
+        catch {
+            return empty;
+        }
+    }
+    /**
+     * Отримати свої оцінки з усіх предметів поточного семестру
+     * @param semester - Семестр, за замовчуванням {@link CabinetStudent.semester}
+     * @returns Масив оцінок {@link Scores} (тільки успішно отримані предмети)
      */
     async getAllScores(semester) {
         if (!this.sesID || !this.sessGUID)
             return [];
         if (!this.disciplines?.length)
-            return [];
-        const targetSemester = semester ?? this.semester;
-        const allScores = [];
-        try {
-            for (const discipline of this.disciplines) {
-                const scores = await getScores(this.sesID, this.sessGUID, discipline.prId, targetSemester);
-                if (scores.ok) {
-                    allScores.push(scores);
-                }
-            }
-            this.allScores = allScores;
-            return allScores;
-        }
-        catch {
-            return [];
-        }
-    }
-    /**
-     * Отримати айді в системі оцінювання
-     */
-    async getId() {
-        if (this.id)
-            return this.id;
-        if (!this.sesID || !this.sessGUID)
-            return undefined;
-        if (!this.disciplines?.length) {
             await this.getDisciplines();
-        }
         if (!this.disciplines?.length)
-            return undefined;
-        try {
-            const result = await getScores(this.sesID, this.sessGUID, this.disciplines[0].prId, this.semester);
-            return result.studentId;
+            return [];
+        const allScores = [];
+        for (const discipline of this.disciplines) {
+            const scores = await this.getScores(discipline.prId, semester);
+            if (scores.ok) {
+                scores.name ??= discipline.name;
+                allScores.push(scores);
+            }
         }
-        catch {
-            return undefined;
-        }
+        this.allScores = allScores;
+        return allScores;
     }
 }

@@ -129,7 +129,7 @@ export class CabinetTeacher {
 
     /**
      * Отримати анкетні данні викладача
-     * @returns Об'єкт {@link Data}
+     * @returns Об'єкт {@link DataTeacher}
      */
     public async getData(): Promise<DataTeacher> {
         if (!this.sesID || !this.sessGUID) return { ok: false };
