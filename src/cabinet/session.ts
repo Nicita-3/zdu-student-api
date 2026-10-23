@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import { fetch } from '../http.js';
 import iconv from 'iconv-lite';
 import { SessionData } from './types.js';
 import { Buffer } from 'buffer';

@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import { fetch } from '../http.js';
 import iconv from 'iconv-lite';
 import { Buffer } from 'buffer';
 /**

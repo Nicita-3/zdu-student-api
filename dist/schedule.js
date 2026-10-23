@@ -1,5 +1,5 @@
 import iconv from 'iconv-lite';
-import fetch from 'cross-fetch';
+import { fetch } from './http.js';
 import { faculties } from './constants.js';
 /**
  * Клас розкладу

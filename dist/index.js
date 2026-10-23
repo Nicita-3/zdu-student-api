@@ -1,6 +1,7 @@
 export * from './schedule.js';
 export * from './types.js';
 export * from './constants.js';
+export { setUserAgent, getUserAgent } from './http.js';
 export * from './utility/groups.js';
 export * from './utility/rooms.js';
 export * from './utility/teachers.js';

@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import { fetch } from '../http.js';
 /**
 * Повертає список типів аудиторій
 * @category Utility

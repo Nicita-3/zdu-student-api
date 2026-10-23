@@ -1,4 +1,4 @@
-import fetch from 'cross-fetch';
+import { fetch } from '../http.js';
 import iconv from 'iconv-lite';
 import { AcademicGroups } from './types.js';
 import { generateCookieString, isLoginPage } from '../cabinet/session.js';

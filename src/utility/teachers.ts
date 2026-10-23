@@ -1,5 +1,5 @@
 import { Teacher } from "../types.js";
-import fetch from 'cross-fetch';
+import { fetch } from '../http.js';
 
 /**
 * Повертає список викладачів
