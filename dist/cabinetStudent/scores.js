@@ -102,7 +102,8 @@ function parseSchedule(columns, html) {
             fields.push(groupFields);
             continue;
         }
-        const headMatch = group.match(/data-ind="(\d+)" data-head="([^"]*)"/);
+        // Журнал віддає data-ind як з префіксом "r" (r867233), так і без нього — зберігаємо лише цифри
+        const headMatch = group.match(/data-ind="r?(\d+)" data-head="([^"]*)"/);
         if (!headMatch)
             continue;
         const index = headMatch[1];
