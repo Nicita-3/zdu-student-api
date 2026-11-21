@@ -82,6 +82,7 @@ function parseSchedule(columns, html) {
     const items = [];
     const fields = [];
     const descriptions = parseDescriptions(html);
+    const usedKeys = new Set();
     // Кожна колонка заняття/модуля починається з заголовка у <span style="white-space:nowrap;">
     const groups = columns.split(`{title:'<span style="white-space:nowrap;">`).slice(1);
     for (const group of groups) {
@@ -102,16 +103,31 @@ function parseSchedule(columns, html) {
             fields.push(groupFields);
             continue;
         }
-        // Журнал віддає data-ind як з префіксом "r" (r867233), так і без нього — зберігаємо лише цифри
-        const headMatch = group.match(/data-ind="r?(\d+)" data-head="([^"]*)"/);
-        if (!headMatch)
-            continue;
-        const index = headMatch[1];
-        const [date = '', type = ''] = headMatch[2].split(/\s+/);
+        // Заголовок колонки: `19.10.2026</span><br>13:20-14:40`
+        const date = group.match(/^(\d{2}\.\d{2}\.\d{4})<\/span>/)?.[1] ?? '';
         const time = group.match(/<br>\s*(\d{2}:\d{2}-\d{2}:\d{2})/)?.[1] ?? '';
+        // Тип заняття — заголовок колонки з оцінкою: `{title:'Лаб', field:'L0a'`
+        const type = group.match(/title:'([^'<]*)', field:'L\d+[ab]?'/)?.[1].trim() ?? '';
         const tooltip = group.match(/headerTooltip:'([^']*)'/)?.[1] ?? '';
         const teacher = tooltip.split(',')[0].trim();
-        items.push({ teacher, date, type, time, index, description: descriptions.get(index) });
+        // ID заняття (`data-ind`, з префіксом "r" або без) є лише в колонках з приміткою.
+        // Для решти генеруємо ключ з дати, часу та типу (див. ScheduleItem.index).
+        const id = group.match(/data-ind="r?(\d+)"/)?.[1];
+        let index;
+        if (id) {
+            index = id;
+        }
+        else {
+            if (!date)
+                continue;
+            const base = `${date}_${time}_${type}`;
+            index = base;
+            for (let n = 2; usedKeys.has(index); n++)
+                index = `${base}_${n}`;
+        }
+        usedKeys.add(index);
+        const description = id ? descriptions.get(id) : undefined;
+        items.push({ teacher, date, type, time, index, description });
         fields.push(groupFields);
     }
     return { items, fields };
@@ -159,7 +175,8 @@ function parseRows(rows) {
  */
 function parseScores(rows, fields) {
     const parsed = parseRows(rows);
-    const row = parsed.find((r) => r.pib?.replace(/<[^>]+>/g, '').trim()) ?? parsed[0];
+    // Без підписаного рядка не беремо перший-ліпший: це були б оцінки іншого студента
+    const row = parsed.find((r) => r.pib?.replace(/<[^>]+>/g, '').trim());
     if (!row)
         return undefined;
     return {
